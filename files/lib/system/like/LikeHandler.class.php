@@ -3,6 +3,7 @@ namespace wcf\system\like;
 use wcf\data\like\object\type\ILikeObjectType;
 use wcf\data\like\object\type\LikeObjectType;
 use wcf\data\like\object\LikeObject;
+use wcf\data\like\object\LikeObjectEditor;
 use wcf\data\like\Like;
 use wcf\data\like\LikeEditor;
 use wcf\data\user\User;
@@ -109,18 +110,18 @@ class LikeHandler extends SingletonFactory {
 		$i = 0;
 		
 		$conditions = new PreparedStatementConditionBuilder();
-		$conditions->add("likeObjectTypeID = ?", array($likeObjectType->likeObjectTypeID));
-		$conditions->add("objectID IN (?)", array($objectIDs));
+		$conditions->add("like_object.likeObjectTypeID = ?", array($likeObjectType->likeObjectTypeID));
+		$conditions->add("like_object.objectID IN (?)", array($objectIDs));
 		$parameters = $conditions->getParameters();
 		
-		if (WCF::getUser()->userID) {
+		if (1) { // DEBUG ONLY: WCF::getUser()->userID) {
 			$sql = "SELECT		like_object.*,
-						CASE WHEN like.userID IS NOT NULL THEN 1 ELSE 0 END AS liked
+						CASE WHEN like_table.userID IS NOT NULL THEN 1 ELSE 0 END AS liked
 				FROM		wcf".WCF_N."_like_object like_object
-				LEFT JOIN	wcf".WCF_N."_like like
-				ON		(like.likeObjectTypeID = like_object.likeObjectTypeID
-						AND like.objectID = like_object.objectID
-						AND like.userID = ?
+				LEFT JOIN	wcf".WCF_N."_like like_table
+				ON		(like_table.likeObjectTypeID = like_object.likeObjectTypeID
+						AND like_table.objectID = like_object.objectID
+						AND like_table.userID = ?)
 				".$conditions;
 			
 			array_unshift($parameters, WCF::getUser()->userID);
@@ -154,9 +155,6 @@ class LikeHandler extends SingletonFactory {
 		if ($like->likeID) {
 			return false;
 		}
-		else {
-			var_dump($like);exit;
-		}
 		
 		// save like
 		LikeEditor::create(array(
@@ -168,13 +166,13 @@ class LikeHandler extends SingletonFactory {
 		));
 		
 		// create / update like cache
-		$likeObject = Like::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
+		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
 		if ($likeObject->likeObjectID) {
 			// build update data
 			$updateData = array('likes' => $likeObject->likes + 1);
 			if (count($likeObject->getUsers()) < 3) {
 				$users = unserialize($likeObject->cachedUsers);
-				$users[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
+				$users[$user->userID] = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
 				$updateData['cachedUsers'] = serialize($users);
 			}
 			
@@ -229,14 +227,20 @@ class LikeHandler extends SingletonFactory {
 			// build update data
 			$updateData = array('likes' => $likeObject->likes - 1);
 			$users = $likeObject->getUsers();
-			if (isset($users[$user->userID])) {
-				unset($users[$user->userID]);
+			if (isset($users[1])) { // DEBUG ONLY: $user->userID])) {
+				unset($users[1]); // DEBUG ONLY: $user->userID]);
 				$updateData['cachedUsers'] = serialize($users);
 			}
 			
-			// update data
 			$likeObjectEditor = new LikeObjectEditor($likeObject);
-			$likeObjectEditor->update($updateData);
+			if (empty($users)) {
+				// remove object instead
+				$likeObjectEditor->delete();
+			}
+			else {
+				// update data
+				$likeObjectEditor->update($updateData);
+			}
 		}
 		
 		// update owner's like counter 

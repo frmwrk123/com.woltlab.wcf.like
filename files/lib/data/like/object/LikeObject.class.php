@@ -2,6 +2,7 @@
 namespace wcf\data\like\object;
 use wcf\data\user\User;
 use wcf\data\DatabaseObject;
+use wcf\system\WCF;
 
 /**
  * Represents a liked object.
