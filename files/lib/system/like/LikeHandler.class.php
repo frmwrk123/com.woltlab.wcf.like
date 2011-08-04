@@ -148,7 +148,8 @@ class LikeHandler extends SingletonFactory {
 	 * @param	wcf\data\like\object\type\ILikeObject	$likeable
 	 * @param	wcf\data\user\User			$user
 	 * @param	boolean					$isDislike
-	 * @param	integer					$time		
+	 * @param	integer					$time	
+	 * @return	array	
 	 */
 	public function like(ILikeObject $likeable, User $user, $isDislike, $time = TIME_NOW) {
 		// verify if object is already liked by user
@@ -160,7 +161,7 @@ class LikeHandler extends SingletonFactory {
 		
 		// if vote is identically just revert the vote
 		if ($like->likeID && ($like->likeValue == $likeValue)) {
-			return $this->revertLike($like, $likeObject, $user);
+			return $this->revertLike($like, $likeable, $likeObject, $user);
 		}
 		
 		// update existing object
@@ -270,10 +271,12 @@ class LikeHandler extends SingletonFactory {
 	 * Reverts the like of an object.
 	 * 
 	 * @param	wcf\data\like\Like			$like
+	 * @param	wcf\data\like\object\ILikeObject	$likeable
 	 * @param	wcf\data\like\object\LikeObject		$likeObject
 	 * @param	wcf\data\user\User			$user
+	 * @return	array
 	 */
-	public function revertLike(Like $like, LikeObject $likeObject, User $user) {
+	public function revertLike(Like $like, ILikeObject $likeable, LikeObject $likeObject, User $user) {
 		// delete like
 		$editor = new LikeEditor($like);
 		$editor->delete();
@@ -317,8 +320,8 @@ class LikeHandler extends SingletonFactory {
 		
 		// update owner's like counter
 		if ($like->likeValue == Like::LIKE) {
-			$user = new UserEditor(new User($likeObject->getUserID()));
-			$user->update(array(
+			$userEditor = new UserEditor(new User($likeable->getUserID()));
+			$userEditor->update(array(
 				'likes' => $user->likes - 1
 			));
 		}
@@ -329,6 +332,13 @@ class LikeHandler extends SingletonFactory {
 		return $this->loadLikeStatus($likeObject, $user);
 	}
 	
+	/**
+	 * Returns current like object status.
+	 * 
+	 * @param	wcf\data\like\object\LikeObject		$likeObject
+	 * @param	wcf\data\user\User			$user
+	 * @return	array
+	 */	
 	protected function loadLikeStatus(LikeObject $likeObject, User $user) {
 		$sql = "SELECT		like_object.likes, like_object.dislikes, like_object.cumulativeLikes,
 					CASE WHEN like_table.likeValue IS NOT NULL THEN like_table.likeValue ELSE 0 END AS liked

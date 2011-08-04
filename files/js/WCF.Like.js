@@ -95,8 +95,8 @@ WCF.Like.prototype = {
 				var $buttonMinus = $container.children('span.likeButtonMinus');
 				
 				// update stats
-				$buttonPlus.html(data.returnValues.likes).removeClass('active');
-				$buttonMinus.html(data.returnValues.dislikes).removeClass('active');
+				$buttonPlus.removeClass('active').text(data.returnValues.likes);
+				$buttonMinus.removeClass('active').text(data.returnValues.dislikes);
 				
 				// mark buttons as active
 				if (data.returnValues.isLiked) {

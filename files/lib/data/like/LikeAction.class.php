@@ -42,18 +42,29 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		throw new ValidateActionException("Action 'update' for likes is not supported.");
 	}
 	
+	/**
+	 * Validates parameters for like-related actions.
+	 */
 	public function validateLike() {
 		if (!WCF::getUser()->userID) {
 			//throw new ValidateActionException("Guests are not allowed to like content.");
 		}
-	}
-	
-	public function validateUnlike() {
-		if (!WCF::getUser()->userID) {
-			//throw new ValidateActionException("Guests are not allowed to unlike content.");
+		
+		if (!isset($this->parameters['data']['objectType'])) {
+			throw new ValidateActionException("Missing parameter 'objectType'.");
+		}
+		
+		if (!isset($this->parameters['data']['isDislike'])) {
+			throw new ValidateActionException("Missing parameter 'isDislike'.");
 		}
 	}
 	
+	/**
+	 * Sets like or dislike for an object, executing this method again with the same parameters
+	 * will revert the status (e.g. removing like/dislike).
+	 * 
+	 * @return	array
+	 */
 	public function like() {
 		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['data']['objectType']);
 		$likeObjectProcessor = $likeObjectType->getProcessor();
@@ -62,17 +73,11 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		
 		// get stats
 		return array(
-			'likes' => $likeData['likes'],
-			'dislikes' => $likeData['dislikes'],
-			'cumulativeLikes' => $likeData['cumulativeLikes'],
+			'likes' => ($likeData['likes'] === null) ? 0 : $likeData['likes'],
+			'dislikes' => ($likeData['dislikes'] === null) ? 0 : $likeData['dislikes'],
+			'cumulativeLikes' => ($likeData['cumulativeLikes'] === null) ? 0 : $likeData['cumulativeLikes'],
 			'isLiked' => ($likeData['liked'] == 1) ? 1 : 0,
 			'isDisliked' => ($likeData['liked'] == -1) ? 1 : 0
 		);
-	}
-	
-	public function unlike() {
-		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['data']['objectType']);
-		$likeableObject = $likeObjectType->getProcessor();
-		$updated = LikeHandler::getInstance()->unlike($likeableObject, WCF::getUser(), $this->parameters['data']['isDislike']);
 	}
 }
