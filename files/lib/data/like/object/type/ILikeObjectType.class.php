@@ -4,56 +4,27 @@ namespace wcf\data\like\object\type;
 /**
  * Any likeable object type should implement this interface.
  *
- * @author	Marcel Werk
+ * @author	Alexander Ebert
  * @copyright	2001-2011 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
- * @subpackage	data.like.object
+ * @subpackage	data.like.object.type
  * @category 	Community Framework
  */
 interface ILikeObjectType {
 	/**
-	 * Returns the title of this likeable.
-	 * 
-	 * @return	string
+	 * Gets a like object by its ID.
+	 *
+	 * @param	integer		$objectID
+	 * @return	wcf\data\like\object\ILikeObject
 	 */
-	public function getTitle();
-	
+	public function getObjectByID($objectID);
+
 	/**
-	 * Returns the url to this likeable.
-	 * 
-	 * @return	string
+	 * Gets like objects by their IDs.
+	 *
+	 * @param	array<integer>		$objectIDs
+	 * @return	array<wcf\data\like\object\ILikeObject>
 	 */
-	public function getURL();
-	
-	/**
-	 * Returns the user id of the owner of this object.
-	 * 
-	 * @return	integer
-	 */
-	public function getUserID();
-	
-	/**
-	 * Returns the id of this object.
-	 * 
-	 * @return	integer
-	 */
-	public function getObjectID();
-	
-	/**
-	 * Gets the object type.
-	 * 
-	 * @return	wcf\data\like\object\type\LikeObjectType
-	 */
-	public function getObjectType();
-	
-	/**
-	 * Increases the like counter of this object.
-	 */
-	public function increaseLikeCounter();
-	
-	/**
-	 * Decreases the like counter of this object.
-	 */
-	public function decreaseLikeCounter();
+	public function getObjectsByIDs(array $objectIDs);
 }

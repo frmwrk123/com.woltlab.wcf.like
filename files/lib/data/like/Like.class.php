@@ -24,6 +24,10 @@ class Like extends DatabaseObject {
 	 */
 	protected static $databaseTableIndexName = 'likeID';
 	
+	const LIKE = 1;
+	
+	const DISLIKE = -1;
+	
 	/**
 	 * Gets a like by type, object id and user id.
 	 * 

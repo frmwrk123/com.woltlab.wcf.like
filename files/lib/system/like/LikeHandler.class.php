@@ -1,7 +1,7 @@
 <?php
 namespace wcf\system\like;
-use wcf\data\like\object\type\ILikeObjectType;
 use wcf\data\like\object\type\LikeObjectType;
+use wcf\data\like\object\ILikeObject;
 use wcf\data\like\object\LikeObject;
 use wcf\data\like\object\LikeObjectEditor;
 use wcf\data\like\Like;
@@ -74,7 +74,7 @@ class LikeHandler extends SingletonFactory {
 	 * Gets a like object. 
 	 * 
 	 * @param	wcf\data\like\object\type\LikeObjectType	$likeObjectType
-	 * @param	integer		$objectID
+	 * @param	integer						$objectID
 	 * @return	wcf\data\like\object\LikeObject
 	 */
 	public function getLikeObject(LikeObjectType $likeObjectType, $objectID) {
@@ -103,8 +103,8 @@ class LikeHandler extends SingletonFactory {
 	 * Loads the like data for a set of objects.
 	 * 
 	 * @param	wcf\data\like\object\type\LikeObjectType	$likeObjectType
-	 * @param	array			$objectIDs
-	 * @return	integer			number of loaded result sets
+	 * @param	array						$objectIDs
+	 * @return	integer						number of loaded result sets
 	 */
 	public function loadLikeObjects(LikeObjectType $likeObjectType, array $objectIDs) {
 		$i = 0;
@@ -145,31 +145,63 @@ class LikeHandler extends SingletonFactory {
 	/**
 	 * Saves the like of an object.
 	 * 
-	 * @param	wcf\data\like\object\type\ILikeObjectType	$likeable
-	 * @param	wcf\data\user\User		$user
-	 * @param	integer		$time		
+	 * @param	wcf\data\like\object\type\ILikeObject	$likeable
+	 * @param	wcf\data\user\User			$user
+	 * @param	boolean					$isDislike
+	 * @param	integer					$time		
 	 */
-	public function like(ILikeObjectType $likeable, User $user, $time = TIME_NOW) {
+	public function like(ILikeObject $likeable, User $user, $isDislike, $time = TIME_NOW) {
 		// verify if object is already liked by user
 		$like = Like::getLike($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID(), 1); // DEBUG ONLY: $user->userID);
-		if ($like->likeID) {
-			return false;
+		$likeValue = ($isDislike) ? Like::DISLIKE : Like::LIKE;
+		
+		// get like object
+		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
+		
+		// if vote is identically just revert the vote
+		if ($like->likeID && ($like->likeValue == $likeValue)) {
+			return $this->revertLike($like, $likeObject, $user);
 		}
 		
-		// save like
-		LikeEditor::create(array(
-			'objectID' => $likeable->getObjectID(),
-			'likeObjectTypeID' => $likeable->getObjectType()->likeObjectTypeID,
-			'objectUserID' => $likeable->getUserID(),
-			'userID' => 1,// DEBUG ONLY: $user->userID,
-			'time' => $time
-		));
-		
-		// create / update like cache
-		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
+		// update existing object
 		if ($likeObject->likeObjectID) {
-			// build update data
-			$updateData = array('likes' => $likeObject->likes + 1);
+			$likes = $likeObject->likes;
+			$dislikes = $likeObject->dislikes;
+			$cumulativeLikes = $likeObject->cumulativeLikes;
+			
+			// previous (dis-)like already exists
+			if ($like->likeID) {
+				// revert like and replace it with a dislike
+				if ($like->likeValue == Like::LIKE) {
+					$likes--;
+					$dislikes++;
+					$cumulativeLikes -= 2;
+				}
+				else {
+					// revert dislike and replace it with a like
+					$likes++;
+					$dislikes--;
+					$cumulativeLikes += 2;
+				}
+			}
+			else {
+				if (!$isDislike) {
+					$likes++;
+					$cumulativeLikes++;
+				}
+				else {
+					$dislikes++;
+					$cumulativeLikes--;
+				}
+			}
+			
+			// build update date
+			$updateData = array(
+				'likes' => $likes,
+				'dislikes' => $dislikes,
+				'cumulativeLikes' => $cumulativeLikes
+			);
+			
 			if (count($likeObject->getUsers()) < 3) {
 				$users = unserialize($likeObject->cachedUsers);
 				$users[$user->userID] = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
@@ -182,76 +214,136 @@ class LikeHandler extends SingletonFactory {
 		}
 		else {
 			// create cache
-			LikeObjectEditor::create(array(
+			$likeObject = LikeObjectEditor::create(array(
 				'likeObjectTypeID' => $likeable->getObjectType()->likeObjectTypeID,
 				'objectID' => $likeable->getObjectID(),
 				'objectUserID' => $likeable->getUserID(),
-				'likes' => 1,
+				'likes' => ($isDislike) ? 0 : 1,
+				'dislikes' => ($isDislike) ? 1 : 0,
+				'cumulativeLikes' => ($isDislike) ? -1 : 1,
 				'cachedUsers' => serialize(array($user->userID => array('userID' => $user->userID, 'username' => $user->username)))
 			));
 		}
 		
-		// update owner's like counter 
-		$userEditor = new UserEditor(new User($likeable->getUserID()));
-		$userEditor->update(array(
-			'likes' => $userEditor->likes + 1
-		));
+		// update owner's like counter
+		if ($like->likeID) {
+			$userEditor = new UserEditor(new User($likeable->getUserID()));
+			$userEditor->update(array(
+				'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes -1 : $userEditor->likes + 1
+			));
+		}
+		else if (!$isDislike) {
+			$userEditor = new UserEditor(new User($likeable->getUserID()));
+			$userEditor->update(array(
+				'likes' => $userEditor->likes + 1
+			));
+		}
+		
+		if (!$like->likeID) {
+			// save like
+			$like = LikeEditor::create(array(
+				'objectID' => $likeable->getObjectID(),
+				'likeObjectTypeID' => $likeable->getObjectType()->likeObjectTypeID,
+				'objectUserID' => $likeable->getUserID(),
+				'userID' => 1,// DEBUG ONLY: $user->userID,
+				'time' => $time,
+				'likeValue' => ($isDislike) ? Like::DISLIKE : Like::LIKE
+			));
+		}
+		else {
+			$likeEditor = new LikeEditor($like);
+			$likeEditor->update(array(
+				'time' => $time,
+				'likeValue' => ($isDislike) ? Like::DISLIKE : Like::LIKE
+			));
+		}
 		
 		// update object's like counter
-		$likeable->increaseLikeCounter();
+		$likeable->increaseLikeCounter($isDislike);
 		
 		// TODO: create notification
 		
-		return true;
+		return $this->loadLikeStatus($likeObject, $user);
 	}
 	
 	/**
-	 * Deletes the like of an object.
+	 * Reverts the like of an object.
 	 * 
-	 * @param	wcf\data\like\object\type\ILikeObjectType	$likeable
-	 * @param	wcf\data\user\User		$user
+	 * @param	wcf\data\like\Like			$like
+	 * @param	wcf\data\like\object\LikeObject		$likeObject
+	 * @param	wcf\data\user\User			$user
 	 */
-	public function unlike(ILikeObjectType $likeable, User $user) {
-		// get like
-		$like = Like::getLike($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID(), 1); // DEBUG ONLY: $user->userID);
-		if (!$like->likeID) {
-			return false;
-		}
+	public function revertLike(Like $like, LikeObject $likeObject, User $user) {
 		// delete like
 		$editor = new LikeEditor($like);
 		$editor->delete();
 		
 		// update like object cache
-		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
-		if ($likeObject->likeObjectID) {
-			// build update data
-			$updateData = array('likes' => $likeObject->likes - 1);
-			$users = $likeObject->getUsers();
-			if (isset($users[1])) { // DEBUG ONLY: $user->userID])) {
-				unset($users[1]); // DEBUG ONLY: $user->userID]);
-				$updateData['cachedUsers'] = serialize($users);
-			}
+		$likes = $likeObject->likes;
+		$dislikes = $likeObject->dislikes;
+		$cumulativeLikes = $likeObject->cumulativeLikes;
 			
-			$likeObjectEditor = new LikeObjectEditor($likeObject);
-			if (empty($users)) {
-				// remove object instead
-				$likeObjectEditor->delete();
-			}
-			else {
-				// update data
-				$likeObjectEditor->update($updateData);
-			}
+		if ($like->likeValue == Like::LIKE) {
+			$likes--;
+			$cumulativeLikes--;
+		}
+		else {
+			$dislikes--;
+			$cumulativeLikes++;
+		}
+			
+		// build update data
+		$updateData = array(
+			'likes' => $likes,
+			'dislikes' => $dislikes,
+			'cumulativeLikes' => $cumulativeLikes
+		);
+			
+		$users = $likeObject->getUsers();
+		if (isset($users[1])) { // DEBUG ONLY: $user->userID])) {
+			unset($users[1]); // DEBUG ONLY: $user->userID]);
+			$updateData['cachedUsers'] = serialize($users);
+		}
+			
+		$likeObjectEditor = new LikeObjectEditor($likeObject);
+		if (empty($users)) {
+			// remove object instead
+			$likeObjectEditor->delete();
+		}
+		else {
+			// update data
+			$likeObjectEditor->update($updateData);
 		}
 		
-		// update owner's like counter 
-		$user = new UserEditor(new User($likeable->getUserID()));
-		$user->update(array(
-			'likes' => $user->likes - 1
-		));
+		// update owner's like counter
+		if ($like->likeValue == Like::LIKE) {
+			$user = new UserEditor(new User($likeObject->getUserID()));
+			$user->update(array(
+				'likes' => $user->likes - 1
+			));
+		}
 		
 		// update object's like counter
-		$likeable->decreaseLikeCounter();
+		$likeable->decreaseLikeCounter($like);
 		
-		return true;
+		return $this->loadLikeStatus($likeObject, $user);
+	}
+	
+	protected function loadLikeStatus(LikeObject $likeObject, User $user) {
+		$sql = "SELECT		like_object.likes, like_object.dislikes, like_object.cumulativeLikes,
+					CASE WHEN like_table.likeValue IS NOT NULL THEN like_table.likeValue ELSE 0 END AS liked
+			FROM		wcf".WCF_N."_like_object like_object
+			LEFT JOIN	wcf".WCF_N."_like like_table
+			ON		(like_table.objectID = like_object.objectID
+					AND like_table.userID = ?)
+			WHERE		like_object.likeObjectID = ?";
+		$statement = WCF::getDB()->prepareStatement($sql);
+		$statement->execute(array(
+			1, // DEBUG ONLY: $user->userID
+			$likeObject->likeObjectID
+		));
+		$row = $statement->fetchArray();
+		
+		return $row;
 	}
 }

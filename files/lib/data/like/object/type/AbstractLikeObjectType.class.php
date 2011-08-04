@@ -4,7 +4,7 @@ use wcf\data\DatabaseObjectDecorator;
 use wcf\data\IDatabaseObjectProcessor;
 
 /**
- * Provides default a implementation for user notification types.
+ * Provides a default implementation for like object types.
  *
  * @author	Alexander Ebert
  * @copyright	2001-2011 WoltLab GmbH
@@ -18,14 +18,4 @@ abstract class AbstractLikeObjectType extends DatabaseObjectDecorator implements
 	 * @see wcf\data\DatabaseObjectDecorator::$baseClass
 	 */
 	protected static $baseClass = 'wcf\data\like\object\type\LikeObjectType';
-	
-	/**
-	 * @see	wcf\data\like\object\type\ILikeObjectType::increaseLikeCounter()
-	 */
-	public function increaseLikeCounter() { }
-	
-	/**
-	 * @see	wcf\data\like\object\type\ILikeObjectType::decreaseLikeCounter()
-	 */
-	public function decreaseLikeCounter() { }
 }

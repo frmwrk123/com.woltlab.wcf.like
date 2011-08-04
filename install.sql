@@ -8,6 +8,7 @@ CREATE TABLE wcf1_like (
 	objectUserID INT(10) NOT NULL DEFAULT 0,
 	userID INT(10) NOT NULL DEFAULT 0,
 	time INT(10) NOT NULL DEFAULT 0,
+	likeValue TINYINT(1) NOT NULL DEFAULT 1,
 	UNIQUE KEY (likeObjectTypeID, objectID, userID),
 	KEY (objectUserID),
 	KEY (userID)
@@ -20,6 +21,8 @@ CREATE TABLE wcf1_like_object (
 	objectID INT(10) NOT NULL DEFAULT 0, 
 	objectUserID INT(10) NOT NULL DEFAULT 0,
 	likes MEDIUMINT(7) NOT NULL DEFAULT 0,
+	dislikes MEDIUMINT(7) NOT NULL DEFAULT 0,
+	cumulativeLikes MEDIUMINT(7) NOT NULL DEFAULT 0,
 	cachedUsers TEXT,
 	UNIQUE KEY (likeObjectTypeID, objectID),
 	KEY (objectUserID)

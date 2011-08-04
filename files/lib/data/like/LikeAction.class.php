@@ -55,14 +55,24 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	}
 	
 	public function like() {
-		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['objectType']);
-		$likeableObject = $likeObjectType->getProcessor();
-		LikeHandler::getInstance()->like($likeableObject, WCF::getUser());
+		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['data']['objectType']);
+		$likeObjectProcessor = $likeObjectType->getProcessor();
+		$likeableObject = $likeObjectProcessor->getObjectByID(1);
+		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), $this->parameters['data']['isDislike']);
+		
+		// get stats
+		return array(
+			'likes' => $likeData['likes'],
+			'dislikes' => $likeData['dislikes'],
+			'cumulativeLikes' => $likeData['cumulativeLikes'],
+			'isLiked' => ($likeData['liked'] == 1) ? 1 : 0,
+			'isDisliked' => ($likeData['liked'] == -1) ? 1 : 0
+		);
 	}
 	
 	public function unlike() {
-		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['objectType']);
+		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['data']['objectType']);
 		$likeableObject = $likeObjectType->getProcessor();
-		LikeHandler::getInstance()->unlike($likeableObject, WCF::getUser());
+		$updated = LikeHandler::getInstance()->unlike($likeableObject, WCF::getUser(), $this->parameters['data']['isDislike']);
 	}
 }
