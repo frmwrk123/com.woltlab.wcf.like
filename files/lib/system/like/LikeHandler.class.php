@@ -52,7 +52,7 @@ class LikeHandler extends SingletonFactory {
 		CacheHandler::getInstance()->addResource(
 			'likeObjectTypes',
 			WCF_DIR.'cache/cache.likeObjectTypes.php',
-			'wcf\system\cache\builder\CacheBuilderLikeObjectType'
+			'wcf\system\cache\builder\LikeObjectTypeCacheBuilder'
 		);
 		$this->likeObjectTypeCache = CacheHandler::getInstance()->get('likeObjectTypes');
 	}
