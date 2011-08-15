@@ -1,7 +1,6 @@
 <?php
 namespace wcf\system\cache\builder;
 use wcf\data\like\object\type\LikeObjectTypeList;
-use wcf\system\cache\ICacheBuilder;
 
 /**
  * Caches like object types.
@@ -10,10 +9,10 @@ use wcf\system\cache\ICacheBuilder;
  * @copyright	2001-2011 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
- * @subpackage	system.cache
+ * @subpackage	system.cache.builder
  * @category 	Community Framework
  */
-class CacheBuilderLikeObjectType implements ICacheBuilder {
+class LikeObjectTypeCacheBuilder implements ICacheBuilder {
 	/**
 	 * @see	wcf\system\cache\ICacheBuilder::getData()
 	 */
