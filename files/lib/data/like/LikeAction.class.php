@@ -46,16 +46,16 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	 * Validates parameters for like-related actions.
 	 */
 	public function validateLike() {
-		if (!WCF::getUser()->userID) {
-			//throw new ValidateActionException("Guests are not allowed to like content.");
+		if (!isset($this->parameters['data']['containerID'])) {
+			throw new ValidateActionException("missing parameter 'containerID'.");
+		}
+		
+		if (!isset($this->parameters['data']['objectID'])) {
+			throw new ValidateActionException("missing parameter 'objectID'.");
 		}
 		
 		if (!isset($this->parameters['data']['objectType'])) {
-			throw new ValidateActionException("Missing parameter 'objectType'.");
-		}
-		
-		if (!isset($this->parameters['data']['isDislike'])) {
-			throw new ValidateActionException("Missing parameter 'isDislike'.");
+			throw new ValidateActionException("missing parameter 'objectType'.");
 		}
 	}
 	
@@ -66,10 +66,11 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	 * @return	array
 	 */
 	public function like() {
-		$likeObjectType = LikeHandler::getInstance()->getLikeObjectType($this->parameters['data']['objectType']);
-		$likeObjectProcessor = $likeObjectType->getProcessor();
-		$likeableObject = $likeObjectProcessor->getObjectByID(1);
-		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), $this->parameters['data']['isDislike']);
+		$objectType = LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']);
+		$objectProvider = $objectType->getProcessor();
+		$likeableObject = $objectProvider->getObjectByID($this->parameters['data']['objectID']);
+		$likeableObject->setObjectType($objectType);
+		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), Like::LIKE);
 		
 		// get stats
 		return array(
@@ -77,7 +78,8 @@ class LikeAction extends AbstractDatabaseObjectAction {
 			'dislikes' => ($likeData['dislikes'] === null) ? 0 : $likeData['dislikes'],
 			'cumulativeLikes' => ($likeData['cumulativeLikes'] === null) ? 0 : $likeData['cumulativeLikes'],
 			'isLiked' => ($likeData['liked'] == 1) ? 1 : 0,
-			'isDisliked' => ($likeData['liked'] == -1) ? 1 : 0
+			'isDisliked' => ($likeData['liked'] == -1) ? 1 : 0,
+			'containerID' => $this->parameters['data']['containerID']
 		);
 	}
 }

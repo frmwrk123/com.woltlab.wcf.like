@@ -1,7 +1,7 @@
 <?php
 namespace wcf\data\like\object;
-use wcf\data\like\object\type\LikeObjectType;
 use wcf\data\like\Like;
+use wcf\data\object\type\ObjectType;
 use wcf\data\DatabaseObjectDecorator;
 
 /**
@@ -36,7 +36,7 @@ abstract class AbstractLikeObject extends DatabaseObjectDecorator implements ILi
 		return $this->objectType;
 	}
 	
-	public function setObjectType(LikeObjectType $objectType) {
+	public function setObjectType(ObjectType $objectType) {
 		$this->objectType = $objectType;
 	}
 }

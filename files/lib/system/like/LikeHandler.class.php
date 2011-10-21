@@ -1,11 +1,12 @@
 <?php
 namespace wcf\system\like;
-use wcf\data\like\object\type\LikeObjectType;
 use wcf\data\like\object\ILikeObject;
 use wcf\data\like\object\LikeObject;
 use wcf\data\like\object\LikeObjectEditor;
 use wcf\data\like\Like;
 use wcf\data\like\LikeEditor;
+use wcf\data\object\type\ObjectType;
+use wcf\data\object\type\ObjectTypeCache;
 use wcf\data\user\User;
 use wcf\data\user\UserEditor;
 use wcf\system\cache\CacheHandler;
@@ -18,11 +19,11 @@ use wcf\system\WCF;
  * 
  * Usage (retrieve all likes for a list of objects):
  * // get type object
- * $likeObjectType = LikeHandler::getInstance()->getLikeObjectType('com.woltlab.wcf.foo.bar');
+ * $objectType = LikeHandler::getInstance()->getObjectType('com.woltlab.wcf.foo.bar');
  * // load like data
- * LikeHandler::getInstance()->loadLikeObjects($likeObjectType, $objectIDs);
+ * LikeHandler::getInstance()->loadLikeObjects($objectType, $objectIDs);
  * // get like data
- * $likeObjects = LikeHandler::getInstance()->getLikeObjects($likeObjectType);
+ * $likeObjects = LikeHandler::getInstance()->getLikeObjects($objectType);
  *
  * @author	Marcel Werk
  * @copyright	2009-2011 WoltLab GmbH
@@ -39,32 +40,27 @@ class LikeHandler extends SingletonFactory {
 	protected $likeObjectCache = array();
 	
 	/**
-	 * cached like object types
+	 * cached object types
 	 * @var	array<array>
 	 */
-	protected $likeObjectTypeCache = null;
+	protected $cache = null;
 	
 	/**
 	 * Creates a new LikeHandler instance.
 	 */
 	protected function init() {
 		// load cache
-		CacheHandler::getInstance()->addResource(
-			'likeObjectTypes',
-			WCF_DIR.'cache/cache.likeObjectTypes.php',
-			'wcf\system\cache\builder\LikeObjectTypeCacheBuilder'
-		);
-		$this->likeObjectTypeCache = CacheHandler::getInstance()->get('likeObjectTypes');
+		$this->cache = ObjectTypeCache::getInstance()->getObjectTypes('com.woltlab.wcf.like.likeableObject');
 	}
 	
 	/**
-	 * Returns a like object type from cache.
+	 * Returns an object type from cache.
 	 * 
-	 * @return	wcf\data\like\object\type\LikeObjectType
+	 * @return	wcf\data\object\type\ObjectType
 	 */
-	public function getLikeObjectType($objectName, $packageID = PACKAGE_ID) {
-		if (isset($this->likeObjectTypeCache[$objectName][$packageID])) {
-			return $this->likeObjectTypeCache[$objectName][$packageID];
+	public function getObjectType($objectName) {
+		if (isset($this->cache[$objectName])) {
+			return $this->cache[$objectName];
 		}
 		
 		return null;
@@ -73,13 +69,13 @@ class LikeHandler extends SingletonFactory {
 	/**
 	 * Gets a like object. 
 	 * 
-	 * @param	wcf\data\like\object\type\LikeObjectType	$likeObjectType
-	 * @param	integer						$objectID
+	 * @param	wcf\data\object\type\ObjectType	$objectType
+	 * @param	integer				$objectID
 	 * @return	wcf\data\like\object\LikeObject
 	 */
-	public function getLikeObject(LikeObjectType $likeObjectType, $objectID) {
-		if (isset($this->likeObjectCache[$likeObjectType->likeObjectTypeID][$objectID])) {
-			return $this->likeObjectCache[$likeObjectType->likeObjectTypeID][$objectID];
+	public function getLikeObject(ObjectType $objectType, $objectID) {
+		if (isset($this->likeObjectCache[$objectType->objectTypeID][$objectID])) {
+			return $this->likeObjectCache[$objectType->objectTypeID][$objectID];
 		}
 		
 		return null;
@@ -88,12 +84,12 @@ class LikeHandler extends SingletonFactory {
 	/**
 	 * Gets the like objects of a specific object type. 
 	 * 
-	 * @param	wcf\data\like\object\type\LikeObjectType	$likeObjectType
+	 * @param	wcf\data\object\type\ObjectType		$objectType
 	 * @return	array<wcf\data\like\object\LikeObject>
 	 */
-	public function getLikeObjects(LikeObjectType $likeObjectType) {
-		if (isset($this->likeObjectCache[$likeObjectType->likeObjectTypeID])) {
-			return $this->likeObjectCache[$likeObjectType->likeObjectTypeID];
+	public function getLikeObjects(ObjectType $objectType) {
+		if (isset($this->likeObjectCache[$objectType->objectTypeID])) {
+			return $this->likeObjectCache[$objectType->objectTypeID];
 		}
 		
 		return array();
@@ -102,24 +98,24 @@ class LikeHandler extends SingletonFactory {
 	/**
 	 * Loads the like data for a set of objects.
 	 * 
-	 * @param	wcf\data\like\object\type\LikeObjectType	$likeObjectType
-	 * @param	array						$objectIDs
-	 * @return	integer						number of loaded result sets
+	 * @param	wcf\data\object\type\ObjectType	$objectType
+	 * @param	array				$objectIDs
+	 * @return	integer				number of loaded result sets
 	 */
-	public function loadLikeObjects(LikeObjectType $likeObjectType, array $objectIDs) {
+	public function loadLikeObjects(ObjectType $objectType, array $objectIDs) {
 		$i = 0;
 		
 		$conditions = new PreparedStatementConditionBuilder();
-		$conditions->add("like_object.likeObjectTypeID = ?", array($likeObjectType->likeObjectTypeID));
+		$conditions->add("like_object.objectTypeID = ?", array($objectType->objectTypeID));
 		$conditions->add("like_object.objectID IN (?)", array($objectIDs));
 		$parameters = $conditions->getParameters();
 		
-		if (1) { // DEBUG ONLY: WCF::getUser()->userID) {
+		if (WCF::getUser()->userID) {
 			$sql = "SELECT		like_object.*,
 						CASE WHEN like_table.userID IS NOT NULL THEN 1 ELSE 0 END AS liked
 				FROM		wcf".WCF_N."_like_object like_object
 				LEFT JOIN	wcf".WCF_N."_like like_table
-				ON		(like_table.likeObjectTypeID = like_object.likeObjectTypeID
+				ON		(like_table.objectTypeID = like_object.objectTypeID
 						AND like_table.objectID = like_object.objectID
 						AND like_table.userID = ?)
 				".$conditions;
@@ -135,7 +131,7 @@ class LikeHandler extends SingletonFactory {
 		$statement = WCF::getDB()->prepareStatement($sql);
 		$statement->execute($parameters);
 		while ($row = $statement->fetchArray()) {
-			$this->likeObjectCache[$likeObjectType->likeObjectTypeID][$row['objectID']] = new LikeObject(null, $row);
+			$this->likeObjectCache[$objectType->objectTypeID][$row['objectID']] = new LikeObject(null, $row);
 			$i++;
 		}
 		
@@ -145,19 +141,18 @@ class LikeHandler extends SingletonFactory {
 	/**
 	 * Saves the like of an object.
 	 * 
-	 * @param	wcf\data\like\object\type\ILikeObject	$likeable
+	 * @param	wcf\data\like\object\ILikeObject	$likeable
 	 * @param	wcf\data\user\User			$user
-	 * @param	boolean					$isDislike
+	 * @param	integer					$likeValue
 	 * @param	integer					$time	
 	 * @return	array	
 	 */
-	public function like(ILikeObject $likeable, User $user, $isDislike, $time = TIME_NOW) {
+	public function like(ILikeObject $likeable, User $user, $likeValue, $time = TIME_NOW) {
 		// verify if object is already liked by user
-		$like = Like::getLike($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID(), 1); // DEBUG ONLY: $user->userID);
-		$likeValue = ($isDislike) ? Like::DISLIKE : Like::LIKE;
+		$like = Like::getLike($likeable->getObjectType()->objectTypeID, $likeable->getObjectID(), $user->userID);
 		
 		// get like object
-		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->likeObjectTypeID, $likeable->getObjectID());
+		$likeObject = LikeObject::getLikeObject($likeable->getObjectType()->objectTypeID, $likeable->getObjectID());
 		
 		// if vote is identically just revert the vote
 		if ($like->likeID && ($like->likeValue == $likeValue)) {
@@ -216,12 +211,12 @@ class LikeHandler extends SingletonFactory {
 		else {
 			// create cache
 			$likeObject = LikeObjectEditor::create(array(
-				'likeObjectTypeID' => $likeable->getObjectType()->likeObjectTypeID,
+				'objectTypeID' => $likeable->getObjectType()->objectTypeID,
 				'objectID' => $likeable->getObjectID(),
 				'objectUserID' => $likeable->getUserID(),
-				'likes' => ($isDislike) ? 0 : 1,
-				'dislikes' => ($isDislike) ? 1 : 0,
-				'cumulativeLikes' => ($isDislike) ? -1 : 1,
+				'likes' => ($likeValue == Like::LIKE) ? 1 : 0,
+				'dislikes' => ($likeValue == Like::DISLIKE) ? 1 : 0,
+				'cumulativeLikes' => $likeValue,
 				'cachedUsers' => serialize(array($user->userID => array('userID' => $user->userID, 'username' => $user->username)))
 			));
 		}
@@ -233,7 +228,7 @@ class LikeHandler extends SingletonFactory {
 				'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes -1 : $userEditor->likes + 1
 			));
 		}
-		else if (!$isDislike) {
+		else if ($likeValue == Like::LIKE) {
 			$userEditor = new UserEditor(new User($likeable->getUserID()));
 			$userEditor->update(array(
 				'likes' => $userEditor->likes + 1
@@ -244,23 +239,23 @@ class LikeHandler extends SingletonFactory {
 			// save like
 			$like = LikeEditor::create(array(
 				'objectID' => $likeable->getObjectID(),
-				'likeObjectTypeID' => $likeable->getObjectType()->likeObjectTypeID,
+				'objectTypeID' => $likeable->getObjectType()->objectTypeID,
 				'objectUserID' => $likeable->getUserID(),
-				'userID' => 1,// DEBUG ONLY: $user->userID,
+				'userID' => $user->userID,
 				'time' => $time,
-				'likeValue' => ($isDislike) ? Like::DISLIKE : Like::LIKE
+				'likeValue' => $likeValue
 			));
 		}
 		else {
 			$likeEditor = new LikeEditor($like);
 			$likeEditor->update(array(
 				'time' => $time,
-				'likeValue' => ($isDislike) ? Like::DISLIKE : Like::LIKE
+				'likeValue' => $likeValue
 			));
 		}
 		
 		// update object's like counter
-		$likeable->increaseLikeCounter($isDislike);
+		$likeable->increaseLikeCounter($likeValue);
 		
 		// TODO: create notification
 		
@@ -303,8 +298,8 @@ class LikeHandler extends SingletonFactory {
 		);
 			
 		$users = $likeObject->getUsers();
-		if (isset($users[1])) { // DEBUG ONLY: $user->userID])) {
-			unset($users[1]); // DEBUG ONLY: $user->userID]);
+		if (isset($users[$user->userID])) {
+			unset($users[$user->userID]);
 			$updateData['cachedUsers'] = serialize($users);
 		}
 			
@@ -349,7 +344,7 @@ class LikeHandler extends SingletonFactory {
 			WHERE		like_object.likeObjectID = ?";
 		$statement = WCF::getDB()->prepareStatement($sql);
 		$statement->execute(array(
-			1, // DEBUG ONLY: $user->userID
+			$user->userID,
 			$likeObject->likeObjectID
 		));
 		$row = $statement->fetchArray();

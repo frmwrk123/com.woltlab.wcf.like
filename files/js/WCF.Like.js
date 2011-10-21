@@ -43,9 +43,11 @@ WCF.Like = Class.extend({
 
 			// set container data
 			this._containerData[$containerID] = {
+				'buttonContainer': null,
 				'cumulativeLikes': $container.data('like-cumulativeLikes'),
 				'objectType': $container.data('objectType'),
-				'objectID': this._getObjectID($containerID)
+				'objectID': this._getObjectID($containerID),
+				'users': $container.data('like-users')
 			};
 
 			// create UI
@@ -87,8 +89,9 @@ WCF.Like = Class.extend({
 	 */
 	_createButtons: function(containerID) {
 		var $buttonContainer = this._getButtonContainer(containerID);
-		
 		var $listItem = $('<li class="likeButtons"></li>').data('containerID', containerID).appendTo($buttonContainer);
+		this._containerData[containerID].buttonContainer = $listItem;
+
 		var $buttonLike = $('<img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" />').appendTo($listItem);
 		var $cumulativeLikes = $('<span>' + this._containers[containerID].data('like-cumulativeLikes') + '</span>').appendTo($listItem);
 		var $buttonDislike = $('<img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" />').appendTo($listItem);
@@ -141,22 +144,20 @@ WCF.Like = Class.extend({
 	 * @param	object		jqXHR
 	 */
 	_success: function(data, textStatus, jqXHR) {
-		if (!this._containers[data.returnValues.containerID]) {
+		var $containerID = data.returnValues.containerID;
+		if (!this._containers[$containerID]) {
 			return;
 		}
 		
 		// update container data
-		var $container = this._containers[data.returnValues.objectType][data.returnValues.objectID];
-		$container.data('likes', data.returnValues.likes);
-		$container.data('dislikes', data.returnValues.dislikes);
-		$container.data('cumulativeLikes', data.returnValues.cumulativeLikes);
+		this._containerData[$containerID].cumulativeLikes = data.returnValues.cumulativeLikes;
 
 		// update label
-		var $likeButtonContainer = $container.find('li.likeButtons').first();
-		$likeButtonContainer.children('span').first().text(data.returnValues.cumulativeLikes);
-
+		var $buttonContainer = this._containerData[$containerID].buttonContainer;
+		$buttonContainer.children('span').first().text(data.returnValues.cumulativeLikes);
+		
 		// mark button as active
-		var $buttons = $likeButtonContainer.children('img');
+		var $buttons = $buttonContainer.children('img');
 		var $buttonLike = $buttons.first().removeClass('active');
 		var $buttonDislike = $buttons.last().removeClass('active');
 

@@ -1,7 +1,7 @@
 <?php
 namespace wcf\data\like\object;
-use wcf\data\like\object\type\LikeObjectType;
 use wcf\data\like\Like;
+use wcf\data\object\type\ObjectType;
 use wcf\data\IDatabaseObjectProcessor;
 
 /**
@@ -53,9 +53,9 @@ interface ILikeObject extends IDatabaseObjectProcessor {
 	/**
 	 * Increases the like counter of this object.
 	 * 
-	 * @param	boolean			$isDislike
+	 * @param	integer		$value
 	 */
-	public function increaseLikeCounter($isDislike);
+	public function increaseLikeCounter($value);
 	
 	/**
 	 * Decreases the like counter of this object.
@@ -67,7 +67,7 @@ interface ILikeObject extends IDatabaseObjectProcessor {
 	/**
 	 * Sets the object type.
 	 * 
-	 * @param	wcf\data\like\object\type\LikeObjectType
+	 * @param	wcf\data\object\type\ObjectType
 	 */
-	public function setObjectType(LikeObjectType $objectType);
+	public function setObjectType(ObjectType $objectType);
 }
