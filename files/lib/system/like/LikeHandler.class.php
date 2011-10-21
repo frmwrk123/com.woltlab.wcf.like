@@ -181,7 +181,7 @@ class LikeHandler extends SingletonFactory {
 				}
 			}
 			else {
-				if (!$isDislike) {
+				if ($likeValue == Like::LIKE) {
 					$likes++;
 					$cumulativeLikes++;
 				}

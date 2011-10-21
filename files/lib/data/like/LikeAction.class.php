@@ -60,17 +60,39 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	}
 	
 	/**
-	 * Sets like or dislike for an object, executing this method again with the same parameters
-	 * will revert the status (e.g. removing like/dislike).
+	 * @see	wcf\data\like\LikeAction::updateLike()
+	 */
+	public function like() {
+		return $this->updateLike(Like::LIKE);
+	}
+	
+	/**
+	 * @see	wcf\data\like\LikeAction::validateLike()
+	 */
+	public function validateDislike() {
+		$this->validateLike();
+	}
+	
+	
+	/**
+	 * @see	wcf\data\like\LikeAction::updateLike()
+	 */
+	public function dislike() {
+		return $this->updateLike(Like::DISLIKE);
+	}
+	
+	/**
+	 * Sets like/dislike for an object, executing this method again with the same parameters
+	 * will revert the status (removing like/dislike).
 	 * 
 	 * @return	array
 	 */
-	public function like() {
+	protected function updateLike($likeValue) {
 		$objectType = LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']);
 		$objectProvider = $objectType->getProcessor();
 		$likeableObject = $objectProvider->getObjectByID($this->parameters['data']['objectID']);
 		$likeableObject->setObjectType($objectType);
-		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), Like::LIKE);
+		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), $likeValue);
 		
 		// get stats
 		return array(
