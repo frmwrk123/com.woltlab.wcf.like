@@ -151,6 +151,9 @@ WCF.Like = Class.extend({
 		
 		// update container data
 		this._containerData[$containerID].cumulativeLikes = data.returnValues.cumulativeLikes;
+		this._containerData[$containerID].users = data.returnValues.users;
+
+		console.debug(data.returnValues.users);
 
 		// update label
 		var $buttonContainer = this._containerData[$containerID].buttonContainer;

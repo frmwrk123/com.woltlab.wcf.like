@@ -159,6 +159,9 @@ class LikeHandler extends SingletonFactory {
 			return $this->revertLike($like, $likeable, $likeObject, $user);
 		}
 		
+		// cached users
+		$users = array();
+		
 		// update existing object
 		if ($likeObject->likeObjectID) {
 			$likes = $likeObject->likes;
@@ -198,8 +201,8 @@ class LikeHandler extends SingletonFactory {
 				'cumulativeLikes' => $cumulativeLikes
 			);
 			
-			if (count($likeObject->getUsers()) < 3) {
-				$users = unserialize($likeObject->cachedUsers);
+			$users = unserialize($likeObject->cachedUsers);
+			if (count($users) < 3) {
 				$users[$user->userID] = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
 				$updateData['cachedUsers'] = serialize($users);
 			}
@@ -209,6 +212,8 @@ class LikeHandler extends SingletonFactory {
 			$likeObjectEditor->update($updateData);
 		}
 		else {
+			$users = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
+			
 			// create cache
 			$likeObject = LikeObjectEditor::create(array(
 				'objectTypeID' => $likeable->getObjectType()->objectTypeID,
@@ -217,7 +222,7 @@ class LikeHandler extends SingletonFactory {
 				'likes' => ($likeValue == Like::LIKE) ? 1 : 0,
 				'dislikes' => ($likeValue == Like::DISLIKE) ? 1 : 0,
 				'cumulativeLikes' => $likeValue,
-				'cachedUsers' => serialize(array($user->userID => array('userID' => $user->userID, 'username' => $user->username)))
+				'cachedUsers' => serialize($users)
 			));
 		}
 		
@@ -259,7 +264,10 @@ class LikeHandler extends SingletonFactory {
 		
 		// TODO: create notification
 		
-		return $this->loadLikeStatus($likeObject, $user);
+		return array(
+			'data' =>$this->loadLikeStatus($likeObject, $user),
+			'users' => $users
+		);
 	}
 	
 	/**
@@ -324,7 +332,10 @@ class LikeHandler extends SingletonFactory {
 		// update object's like counter
 		$likeable->decreaseLikeCounter($like);
 		
-		return $this->loadLikeStatus($likeObject, $user);
+		return array(
+			'data' => $this->loadLikeStatus($likeObject, $user),
+			'users' => $users
+		);
 	}
 	
 	/**

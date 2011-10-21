@@ -96,12 +96,13 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		
 		// get stats
 		return array(
-			'likes' => ($likeData['likes'] === null) ? 0 : $likeData['likes'],
-			'dislikes' => ($likeData['dislikes'] === null) ? 0 : $likeData['dislikes'],
-			'cumulativeLikes' => ($likeData['cumulativeLikes'] === null) ? 0 : $likeData['cumulativeLikes'],
-			'isLiked' => ($likeData['liked'] == 1) ? 1 : 0,
-			'isDisliked' => ($likeData['liked'] == -1) ? 1 : 0,
-			'containerID' => $this->parameters['data']['containerID']
+			'likes' => ($likeData['data']['likes'] === null) ? 0 : $likeData['data']['likes'],
+			'dislikes' => ($likeData['data']['dislikes'] === null) ? 0 : $likeData['data']['dislikes'],
+			'cumulativeLikes' => ($likeData['data']['cumulativeLikes'] === null) ? 0 : $likeData['data']['cumulativeLikes'],
+			'isLiked' => ($likeData['data']['liked'] == 1) ? 1 : 0,
+			'isDisliked' => ($likeData['data']['liked'] == -1) ? 1 : 0,
+			'containerID' => $this->parameters['data']['containerID'],
+			'users' => $likeData['users']
 		);
 	}
 }
