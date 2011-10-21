@@ -20,22 +20,27 @@ abstract class AbstractLikeObject extends DatabaseObjectDecorator implements ILi
 	 */
 	protected static $baseClass = 'wcf\data\like\object\LikeObject';
 	
+	/**
+	 * object type
+	 * @var	wcf\data\object\type\ObjectType
+	 */
 	protected $objectType = null;
 	
 	/**
-	 * @see	wcf\data\like\object\ILikeObject::increaseLikeCounter()
+	 * @see	wcf\data\like\object\ILikeObject::updateLikeCounter()
 	 */
-	public function increaseLikeCounter($isDislike) { }
+	public function updateLikeCounter($cumulativeLikes) { }
 	
 	/**
-	 * @see	wcf\data\like\object\ILikeObject::decreaseLikeCounter()
+	 * @see	wcf\data\like\object\ILikeObject::getObjectType()
 	 */
-	public function decreaseLikeCounter(Like $like) { }
-	
 	public function getObjectType() {
 		return $this->objectType;
 	}
 	
+	/**
+	 * @see	wcf\data\like\object\ILikeObject::setObjectType()
+	 */
 	public function setObjectType(ObjectType $objectType) {
 		$this->objectType = $objectType;
 	}

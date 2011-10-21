@@ -159,7 +159,8 @@ class LikeHandler extends SingletonFactory {
 			return $this->revertLike($like, $likeable, $likeObject, $user);
 		}
 		
-		// cached users
+		// like data
+		$cumulativeLikes = 0;
 		$users = array();
 		
 		// update existing object
@@ -212,6 +213,7 @@ class LikeHandler extends SingletonFactory {
 			$likeObjectEditor->update($updateData);
 		}
 		else {
+			$cumulativeLikes = $likeValue;
 			$users = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
 			
 			// create cache
@@ -221,7 +223,7 @@ class LikeHandler extends SingletonFactory {
 				'objectUserID' => $likeable->getUserID(),
 				'likes' => ($likeValue == Like::LIKE) ? 1 : 0,
 				'dislikes' => ($likeValue == Like::DISLIKE) ? 1 : 0,
-				'cumulativeLikes' => $likeValue,
+				'cumulativeLikes' => $cumulativeLikes,
 				'cachedUsers' => serialize($users)
 			));
 		}
@@ -260,7 +262,7 @@ class LikeHandler extends SingletonFactory {
 		}
 		
 		// update object's like counter
-		$likeable->increaseLikeCounter($likeValue);
+		$likeable->updateLikeCounter($cumulativeLikes);
 		
 		// TODO: create notification
 		
@@ -330,7 +332,7 @@ class LikeHandler extends SingletonFactory {
 		}
 		
 		// update object's like counter
-		$likeable->decreaseLikeCounter($like);
+		$likeable->updateLikeCounter($cumulativeLikes);
 		
 		return array(
 			'data' => $this->loadLikeStatus($likeObject, $user),

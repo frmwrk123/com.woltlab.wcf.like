@@ -51,18 +51,11 @@ interface ILikeObject extends IDatabaseObjectProcessor {
 	public function getObjectType();
 	
 	/**
-	 * Increases the like counter of this object.
+	 * Updates the cumulative likes for this object.
 	 * 
-	 * @param	integer		$value
+	 * @param	integer		$cumulativeLikes
 	 */
-	public function increaseLikeCounter($value);
-	
-	/**
-	 * Decreases the like counter of this object.
-	 * 
-	 * @param	wcf\data\like\Like	$like
-	 */
-	public function decreaseLikeCounter(Like $like);
+	public function updateLikeCounter($cumulativeLikes);
 	
 	/**
 	 * Sets the object type.
