@@ -20,5 +20,6 @@
 	<instructions type="install">
 		<instruction type="file">files.tar</instruction>
 		<instruction type="sql">install.sql</instruction>
+		<instruction type="objectTypeDefinition">objectTypeDefinition.xml</instruction>
 	</instructions>
 </package>
