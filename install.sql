@@ -33,5 +33,3 @@ ALTER TABLE wcf1_like ADD FOREIGN KEY (objectTypeID) REFERENCES wcf1_object_type
 ALTER TABLE wcf1_like ADD FOREIGN KEY (userID) REFERENCES wcf1_user (userID) ON DELETE CASCADE;
 
 ALTER TABLE wcf1_like_object ADD FOREIGN KEY (objectTypeID) REFERENCES wcf1_object_type (objectTypeID) ON DELETE CASCADE;
-
-ALTER TABLE wcf1_like_object_type ADD FOREIGN KEY (packageID) REFERENCES wcf1_package (packageID) ON DELETE CASCADE;
