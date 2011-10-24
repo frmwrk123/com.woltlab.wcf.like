@@ -43,7 +43,9 @@ WCF.Like = Class.extend({
 
 			// set container data
 			this._containerData[$containerID] = {
-				'buttonContainer': null,
+				'likeButton': null,
+				'badge': null,
+				'dislikeButton': null,
 				'cumulativeLikes': $container.data('like-cumulativeLikes'),
 				'objectType': $container.data('objectType'),
 				'objectID': this._getObjectID($containerID),
@@ -89,17 +91,17 @@ WCF.Like = Class.extend({
 	 */
 	_createButtons: function(containerID) {
 		var $buttonContainer = this._getButtonContainer(containerID);
-		var $listItem = $('<li class="likeButtons"></li>').data('containerID', containerID).appendTo($buttonContainer);
-		this._containerData[containerID].buttonContainer = $listItem;
 
-		var $buttonLike = $('<img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" />').appendTo($listItem);
-		var $cumulativeLikes = $('<span>' + this._containers[containerID].data('like-cumulativeLikes') + '</span>').appendTo($listItem);
-		var $buttonDislike = $('<img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" />').appendTo($listItem);
+		var $likeButton = $('<li class="likeButton"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span>like</span></li>').appendTo($buttonContainer);
+		var $cumulativeLikes = $('<li class="likeButton separator"><span class="badge">' + this._containers[containerID].data('like-cumulativeLikes') + '</span></li>').data('containerID', containerID).appendTo($buttonContainer);
+		var $dislikeButton = $('<li class="likeButton separator"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span>dislike</span></li>').appendTo($buttonContainer);
 
-		$buttonLike.data('type', 'like').click($.proxy(this._click, this));
-		$buttonDislike.data('type', 'dislike').click($.proxy(this._click, this));
+		this._containerData[containerID].likeButton = $likeButton;
+		this._containerData[containerID].badge = $cumulativeLikes;
+		this._containerData[containerID].dislikeButton = $dislikeButton;
 
-		return $listItem;
+		$likeButton.data('containerID', containerID).data('type', 'like').click($.proxy(this._click, this));
+		$dislikeButton.data('containerID', containerID).data('type', 'dislike').click($.proxy(this._click, this));
 	},
 	
 	/**
@@ -108,10 +110,32 @@ WCF.Like = Class.extend({
 	 * @param	object		event
 	 */
 	_click: function(event) {
-		var $button = $(event.target);
-		var $buttonContainer = $button.parent();
-		
-		this._sendRequest($buttonContainer.data('containerID'), $button.data('type'));
+		var $button = this._getTarget($(event.target));
+		if ($button === null) {
+			console.debug("[WCF.Like] Unable to find target button, aborting.");
+			return;
+		}
+
+		this._sendRequest($button.data('containerID'), $button.data('type'));
+	},
+
+	/**
+	 * Returns the target element or null if we could not find it.
+	 * 
+	 * @param	jQuery		target
+	 * @return	jQuery
+	 */
+	_getTarget: function(target) {
+		if (target.getTagName() == 'li') {
+			return target;
+		}
+
+		target = target.parent();
+		if (target.getTagName() == 'li') {
+			return target;
+		}
+
+		return null;
 	},
 	
 	/**
@@ -153,22 +177,18 @@ WCF.Like = Class.extend({
 		this._containerData[$containerID].cumulativeLikes = data.returnValues.cumulativeLikes;
 		this._containerData[$containerID].users = data.returnValues.users;
 
-		console.debug(data.returnValues.users);
-
 		// update label
-		var $buttonContainer = this._containerData[$containerID].buttonContainer;
-		$buttonContainer.children('span').first().text(data.returnValues.cumulativeLikes);
+		this._containerData[$containerID].badge.children('span').text(data.returnValues.cumulativeLikes);
 		
 		// mark button as active
-		var $buttons = $buttonContainer.children('img');
-		var $buttonLike = $buttons.first().removeClass('active');
-		var $buttonDislike = $buttons.last().removeClass('active');
+		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
+		var $dislikeButton = this._containerData[$containerID].dislikeButton.removeClass('active');
 
 		if (data.returnValues.isLiked) {
-			$buttonLike.addClass('active');
+			$likeButton.addClass('active');
 		}
 		else if (data.returnValues.isDisliked) {
-			$buttonDislike.addClass('active');
+			$dislikeButton.addClass('active');
 		}
 	}
 });
