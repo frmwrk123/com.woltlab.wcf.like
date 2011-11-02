@@ -85,17 +85,32 @@ WCF.Like = Class.extend({
 	_getObjectID: function(containerID) { },
 
 	/**
+	 * Adds buttons for like and dislike.
+	 * 
+	 * @param	integer		containerID
+	 * @param	jQuery		likeButton
+	 * @param	jQuery		cumulativeLikes
+	 * @param	jQuery		dislikeButton
+	 */
+	_addButtons: function(containerID, likeButton, cumulativeLikes, dislikeButton) {
+		var $buttonContainer = this._getButtonContainer(containerID);
+		
+		likeButton.appendTo($buttonContainer);
+		cumulativeLikes.appendTo($buttonContainer);
+		dislikeButton.appendTo($buttonContainer);
+	},
+	
+	/**
 	 * Creates buttons for like and dislike.
 	 * 
 	 * @param	integer		containerID
 	 */
 	_createButtons: function(containerID) {
-		var $buttonContainer = this._getButtonContainer(containerID);
-
-		var $likeButton = $('<li class="likeButton"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span>like</span></li>').appendTo($buttonContainer);
-		var $cumulativeLikes = $('<li class="likeButton separator"><span class="badge">' + this._containers[containerID].data('like-cumulativeLikes') + '</span></li>').data('containerID', containerID).appendTo($buttonContainer);
-		var $dislikeButton = $('<li class="likeButton separator"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span>dislike</span></li>').appendTo($buttonContainer);
-
+		var $likeButton = $('<li class="likeButton balloonTooltip" title="Like"><a><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /></a></li>');
+		var $cumulativeLikes = $('<li class="likeButton"><a><span class="badge">' + this._containers[containerID].data('like-cumulativeLikes') + '</span></a></li>').data('containerID', containerID);
+		var $dislikeButton = $('<li class="likeButton balloonTooltip" title="Dislike"><a><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /></a></li>');
+		this._addButtons(containerID, $likeButton, $cumulativeLikes, $dislikeButton);
+				
 		this._containerData[containerID].likeButton = $likeButton;
 		this._containerData[containerID].badge = $cumulativeLikes;
 		this._containerData[containerID].dislikeButton = $dislikeButton;
