@@ -125,7 +125,7 @@ WCF.Like = Class.extend({
 	 * @param	object		event
 	 */
 	_click: function(event) {
-		var $button = this._getTarget($(event.target));
+		var $button = $(event.currentTarget);
 		if ($button === null) {
 			console.debug("[WCF.Like] Unable to find target button, aborting.");
 			return;
@@ -134,25 +134,6 @@ WCF.Like = Class.extend({
 		this._sendRequest($button.data('containerID'), $button.data('type'));
 	},
 
-	/**
-	 * Returns the target element or null if we could not find it.
-	 * 
-	 * @param	jQuery		target
-	 * @return	jQuery
-	 */
-	_getTarget: function(target) {
-		if (target.getTagName() == 'li') {
-			return target;
-		}
-
-		target = target.parent();
-		if (target.getTagName() == 'li') {
-			return target;
-		}
-
-		return null;
-	},
-	
 	/**
 	 * Sends request through proxy.
 	 * 
@@ -184,6 +165,7 @@ WCF.Like = Class.extend({
 	 */
 	_success: function(data, textStatus, jqXHR) {
 		var $containerID = data.returnValues.containerID;
+		
 		if (!this._containers[$containerID]) {
 			return;
 		}
@@ -193,7 +175,7 @@ WCF.Like = Class.extend({
 		this._containerData[$containerID].users = data.returnValues.users;
 
 		// update label
-		this._containerData[$containerID].badge.children('span').text(data.returnValues.cumulativeLikes);
+		this._containerData[$containerID].badge.find('span').text(data.returnValues.cumulativeLikes);
 		
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
