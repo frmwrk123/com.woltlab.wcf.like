@@ -73,7 +73,6 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		$this->validateLike();
 	}
 	
-	
 	/**
 	 * @see	wcf\data\like\LikeAction::updateLike()
 	 */

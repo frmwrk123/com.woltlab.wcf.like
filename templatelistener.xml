@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/templatelistener.xsd">
+	<import>
+		<templatelistener name="javascriptInclude">
+			<environment>user</environment>
+			<templatename>headInclude</templatename>
+			<eventname>javascriptInclude</eventname>
+			<templatecode><![CDATA[<script type="text/javascript" src="{@RELATIVE_WCF_DIR}js/WCF.Like.js"></script>]]></templatecode>
+		</templatelistener>
+		
+		<templatelistener name="javascriptLanguageImport">
+			<environment>user</environment>
+			<templatename>headInclude</templatename>
+			<eventname>javascriptLanguageImport</eventname>
+			<templatecode><![CDATA[,'wcf.like.button.like': '{icon}wcf.like.button.like{/icon}','wcf.like.button.dislike': '{icon}wcf.like.button.dislike{/icon}']]></templatecode>
+		</templatelistener>
+		
+		<templatelistener name="javascriptIconImport">
+			<environment>user</environment>
+			<templatename>headInclude</templatename>
+			<eventname>javascriptIconImport</eventname>
+			<templatecode><![CDATA[,'wcf.icon.like': '{icon}like1{/icon}','wcf.icon.dislike': '{icon}dislike1{/icon}']]></templatecode>
+		</templatelistener>
+	</import>
+</data>

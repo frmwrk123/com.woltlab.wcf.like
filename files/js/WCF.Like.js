@@ -106,9 +106,17 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 */
 	_createButtons: function(containerID) {
-		var $likeButton = $('<li class="likeButton balloonTooltip" title="Like"><a><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /></a></li>');
-		var $cumulativeLikes = $('<li class="likeButton"><a><span class="badge">' + this._containers[containerID].data('like-cumulativeLikes') + '</span></a></li>').data('containerID', containerID);
-		var $dislikeButton = $('<li class="likeButton balloonTooltip" title="Dislike"><a><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /></a></li>');
+		var $users = eval(this._containers[containerID].data('like-users'));
+		var $title = '';
+		
+		for (var $userID in $users) {
+			if ($title != '') $title += ', ';
+			$title += $users[$userID];
+		}
+		
+		var $likeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.like')+'"><a><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /></a></li>');
+		var $cumulativeLikes = $('<li class="likeButton balloonTooltip" title="'+$title+' gefaellt das."><a><span class="badge">' + (this._containers[containerID].data('like-cumulativeLikes') > 0 ? '+' : '') +  this._containers[containerID].data('like-cumulativeLikes') + '</span></a></li>').data('containerID', containerID);
+		var $dislikeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.dislike')+'"><a><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /></a></li>');
 		this._addButtons(containerID, $likeButton, $cumulativeLikes, $dislikeButton);
 				
 		this._containerData[containerID].likeButton = $likeButton;
@@ -175,7 +183,7 @@ WCF.Like = Class.extend({
 		this._containerData[$containerID].users = data.returnValues.users;
 
 		// update label
-		this._containerData[$containerID].badge.find('span').text(data.returnValues.cumulativeLikes);
+		this._containerData[$containerID].badge.find('span').text((data.returnValues.cumulativeLikes > 0 ? '+' : '') + data.returnValues.cumulativeLikes);
 		
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');

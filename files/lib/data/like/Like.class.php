@@ -41,7 +41,7 @@ class Like extends DatabaseObject {
 			FROM	wcf".WCF_N."_like
 			WHERE	objectTypeID = ?
 				AND objectID = ?
-				AND objectUserID = ?";
+				AND userID = ?";
 		$statement = WCF::getDB()->prepareStatement($sql);
 		$statement->execute(array(
 			$objectTypeID,
