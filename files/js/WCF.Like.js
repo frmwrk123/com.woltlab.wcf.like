@@ -49,7 +49,7 @@ WCF.Like = Class.extend({
 				'cumulativeLikes': $container.data('like-cumulativeLikes'),
 				'objectType': $container.data('objectType'),
 				'objectID': this._getObjectID($containerID),
-				'users': $container.data('like-users')
+				'users': eval($container.data('like-users'))
 			};
 
 			// create UI
@@ -106,16 +106,8 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 */
 	_createButtons: function(containerID) {
-		var $users = eval(this._containers[containerID].data('like-users'));
-		var $title = '';
-		
-		for (var $userID in $users) {
-			if ($title != '') $title += ', ';
-			$title += $users[$userID];
-		}
-		
 		var $likeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.like')+'"><a><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /></a></li>');
-		var $cumulativeLikes = $('<li class="likeButton balloonTooltip" title="'+$title+' gefaellt das."><a><span class="badge">' + (this._containers[containerID].data('like-cumulativeLikes') > 0 ? '+' : '') +  this._containers[containerID].data('like-cumulativeLikes') + '</span></a></li>').data('containerID', containerID);
+		var $cumulativeLikes = $('<li class="likeButton balloonTooltip"><a><span class="badge"></span></a></li>').data('containerID', containerID);
 		var $dislikeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.dislike')+'"><a><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /></a></li>');
 		this._addButtons(containerID, $likeButton, $cumulativeLikes, $dislikeButton);
 				
@@ -125,6 +117,8 @@ WCF.Like = Class.extend({
 
 		$likeButton.data('containerID', containerID).data('type', 'like').click($.proxy(this._click, this));
 		$dislikeButton.data('containerID', containerID).data('type', 'dislike').click($.proxy(this._click, this));
+		
+		this._updateBadge(containerID);
 	},
 	
 	/**
@@ -183,7 +177,8 @@ WCF.Like = Class.extend({
 		this._containerData[$containerID].users = data.returnValues.users;
 
 		// update label
-		this._containerData[$containerID].badge.find('span').text((data.returnValues.cumulativeLikes > 0 ? '+' : '') + data.returnValues.cumulativeLikes);
+		this._updateBadge($containerID);
+		//this._containerData[$containerID].badge.find('span').text((data.returnValues.cumulativeLikes > 0 ? '+' : '') + data.returnValues.cumulativeLikes);
 		
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
@@ -195,5 +190,16 @@ WCF.Like = Class.extend({
 		else if (data.returnValues.isDisliked) {
 			$dislikeButton.addClass('active');
 		}
+	},
+	
+	_updateBadge: function(containerID) {
+		var $users = this._containerData[containerID].users;
+		var $userArray = [];
+		for (var $userID in $users) $userArray.push($users[$userID]);
+		var $usersString = $userArray.join(', ');
+		
+		if ($usersString) this._containerData[containerID].badge.attr('title', $usersString + ' gefaellt das.');
+		else this._containerData[containerID].badge.attr('title', '');
+		this._containerData[containerID].badge.find('.badge').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') +  this._containerData[containerID].cumulativeLikes);
 	}
 });

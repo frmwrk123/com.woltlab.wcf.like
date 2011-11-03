@@ -204,7 +204,7 @@ class LikeHandler extends SingletonFactory {
 			
 			$users = unserialize($likeObject->cachedUsers);
 			if (count($users) < 3) {
-				$users[$user->userID] = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
+				$users[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
 				$updateData['cachedUsers'] = serialize($users);
 			}
 			
@@ -308,13 +308,17 @@ class LikeHandler extends SingletonFactory {
 		);
 			
 		$users = $likeObject->getUsers();
-		if (isset($users[$user->userID])) {
-			unset($users[$user->userID]);
-			$updateData['cachedUsers'] = serialize($users);
+		$usersArray = array();
+		foreach ($users as $user) {
+			$usersArray[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
+		}
+		if (isset($usersArray[$user->userID])) {
+			unset($usersArray[$user->userID]);
+			$updateData['cachedUsers'] = serialize($usersArray);
 		}
 			
 		$likeObjectEditor = new LikeObjectEditor($likeObject);
-		if (empty($users)) {
+		if (empty($usersArray)) {
 			// remove object instead
 			$likeObjectEditor->delete();
 		}
@@ -336,7 +340,7 @@ class LikeHandler extends SingletonFactory {
 		
 		return array(
 			'data' => $this->loadLikeStatus($likeObject, $user),
-			'users' => $users
+			'users' => $usersArray
 		);
 	}
 	
