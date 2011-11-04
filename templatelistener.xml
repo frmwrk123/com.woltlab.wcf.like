@@ -12,7 +12,7 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptLanguageImport</eventname>
-			<templatecode><![CDATA[,'wcf.like.button.like': '{icon}wcf.like.button.like{/icon}','wcf.like.button.dislike': '{icon}wcf.like.button.dislike{/icon}']]></templatecode>
+			<templatecode><![CDATA[,'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}']]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="javascriptIconImport">
