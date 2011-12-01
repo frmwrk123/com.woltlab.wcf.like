@@ -220,7 +220,7 @@ class LikeHandler extends SingletonFactory {
 			$likeObject = LikeObjectEditor::create(array(
 				'objectTypeID' => $likeable->getObjectType()->objectTypeID,
 				'objectID' => $likeable->getObjectID(),
-				'objectUserID' => $likeable->getUserID(),
+				'objectUserID' => ($likeable->getUserID() ?: null),
 				'likes' => ($likeValue == Like::LIKE) ? 1 : 0,
 				'dislikes' => ($likeValue == Like::DISLIKE) ? 1 : 0,
 				'cumulativeLikes' => $cumulativeLikes,
@@ -229,17 +229,19 @@ class LikeHandler extends SingletonFactory {
 		}
 		
 		// update owner's like counter
-		if ($like->likeID) {
-			$userEditor = new UserEditor(new User($likeable->getUserID()));
-			$userEditor->update(array(
-				'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes -1 : $userEditor->likes + 1
-			));
-		}
-		else if ($likeValue == Like::LIKE) {
-			$userEditor = new UserEditor(new User($likeable->getUserID()));
-			$userEditor->update(array(
-				'likes' => $userEditor->likes + 1
-			));
+		if ($likeable->getUserID()) {
+			if ($like->likeID) {
+				$userEditor = new UserEditor(new User($likeable->getUserID()));
+				$userEditor->update(array(
+					'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes -1 : $userEditor->likes + 1
+				));
+			}
+			else if ($likeValue == Like::LIKE) {
+				$userEditor = new UserEditor(new User($likeable->getUserID()));
+				$userEditor->update(array(
+					'likes' => $userEditor->likes + 1
+				));
+			}
 		}
 		
 		if (!$like->likeID) {
@@ -247,7 +249,7 @@ class LikeHandler extends SingletonFactory {
 			$like = LikeEditor::create(array(
 				'objectID' => $likeable->getObjectID(),
 				'objectTypeID' => $likeable->getObjectType()->objectTypeID,
-				'objectUserID' => $likeable->getUserID(),
+				'objectUserID' => ($likeable->getUserID() ?: null),
 				'userID' => $user->userID,
 				'time' => $time,
 				'likeValue' => $likeValue
@@ -328,11 +330,13 @@ class LikeHandler extends SingletonFactory {
 		}
 		
 		// update owner's like counter
-		if ($like->likeValue == Like::LIKE) {
-			$userEditor = new UserEditor(new User($likeable->getUserID()));
-			$userEditor->update(array(
-				'likes' => $user->likes - 1
-			));
+		if ($likeable->getUserID()) {
+			if ($like->likeValue == Like::LIKE) {
+				$userEditor = new UserEditor(new User($likeable->getUserID()));
+				$userEditor->update(array(
+					'likes' => $user->likes - 1
+				));
+			}
 		}
 		
 		// update object's like counter
