@@ -233,7 +233,7 @@ class LikeHandler extends SingletonFactory {
 			if ($like->likeID) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
 				$userEditor->update(array(
-					'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes -1 : $userEditor->likes + 1
+					'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes - 1 : $userEditor->likes + 1
 				));
 			}
 			else if ($likeValue == Like::LIKE) {
