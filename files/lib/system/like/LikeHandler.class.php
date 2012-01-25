@@ -112,7 +112,7 @@ class LikeHandler extends SingletonFactory {
 		
 		if (WCF::getUser()->userID) {
 			$sql = "SELECT		like_object.*,
-						CASE WHEN like_table.userID IS NOT NULL THEN 1 ELSE 0 END AS liked
+						CASE WHEN like_table.userID IS NOT NULL THEN like_table.likeValue ELSE 0 END AS liked
 				FROM		wcf".WCF_N."_like_object like_object
 				LEFT JOIN	wcf".WCF_N."_like like_table
 				ON		(like_table.objectTypeID = like_object.objectTypeID
@@ -202,10 +202,19 @@ class LikeHandler extends SingletonFactory {
 				'cumulativeLikes' => $cumulativeLikes
 			);
 			
-			$users = unserialize($likeObject->cachedUsers);
-			if (count($users) < 3) {
-				$users[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
-				$updateData['cachedUsers'] = serialize($users);
+			if ($likeValue == 1) {
+				$users = unserialize($likeObject->cachedUsers);
+				if (count($users) < 3) {
+					$users[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
+					$updateData['cachedUsers'] = serialize($users);
+				}
+			}
+			else if ($likeValue == -1) {
+				$users = unserialize($likeObject->cachedUsers);
+				if (isset($users[$user->userID])) {
+					unset($users[$user->userID]);
+					$updateData['cachedUsers'] = serialize($users);
+				}
 			}
 			
 			// update data
@@ -214,7 +223,8 @@ class LikeHandler extends SingletonFactory {
 		}
 		else {
 			$cumulativeLikes = $likeValue;
-			$users = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
+			$users = array();
+			if ($likeValue == 1) $users = array($user->userID => array('userID' => $user->userID, 'username' => $user->username));
 			
 			// create cache
 			$likeObject = LikeObjectEditor::create(array(

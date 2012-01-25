@@ -49,11 +49,12 @@ WCF.Like = Class.extend({
 				'cumulativeLikes': $container.data('like-cumulativeLikes'),
 				'objectType': $container.data('objectType'),
 				'objectID': this._getObjectID($containerID),
-				'users': eval($container.data('like-users'))
+				'users': eval($container.data('like-users')),
+				'liked': $container.data('like-liked')
 			};
 
 			// create UI
-			this._createButtons($containerID);
+			this._createWidget($containerID);
 		}, this));
 
 		this._proxy = new WCF.Action.Proxy({
@@ -69,12 +70,12 @@ WCF.Like = Class.extend({
 	_getContainers: function() { },
 
 	/**
-	 * Returns button container for target object container.
+	 * Returns widget container for target object container.
 	 * 
 	 * @param	string		containerID
 	 * @return	jQuery
 	 */
-	_getButtonContainer: function(containerID) { },
+	_getWidgetContainer: function(containerID) { },
 
 	/**
 	 * Returns object id for targer object container.
@@ -85,38 +86,43 @@ WCF.Like = Class.extend({
 	_getObjectID: function(containerID) { },
 
 	/**
-	 * Adds buttons for like and dislike.
+	 * Adds the like widget.
 	 * 
 	 * @param	integer		containerID
-	 * @param	jQuery		likeButton
-	 * @param	jQuery		cumulativeLikes
-	 * @param	jQuery		dislikeButton
+	 * @param	jQuery		widget
 	 */
-	_addButtons: function(containerID, likeButton, cumulativeLikes, dislikeButton) {
-		var $buttonContainer = this._getButtonContainer(containerID);
+	_addWidget: function(containerID, widget) {
+		var $widgetContainer = this._getWidgetContainer(containerID);
 		
-		likeButton.appendTo($buttonContainer);
-		cumulativeLikes.appendTo($buttonContainer);
-		dislikeButton.appendTo($buttonContainer);
+		widget.appendTo($widgetContainer);
 	},
 	
 	/**
-	 * Creates buttons for like and dislike.
+	 * Creates the like widget.
 	 * 
 	 * @param	integer		containerID
 	 */
-	_createButtons: function(containerID) {
-		var $likeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.like')+'"><a><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /></a></li>');
-		var $cumulativeLikes = $('<li class="likeButton balloonTooltip"><a><span class="badge"></span></a></li>').data('containerID', containerID);
-		var $dislikeButton = $('<li class="likeButton balloonTooltip" title="'+WCF.Language.get('wcf.like.button.dislike')+'"><a><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /></a></li>');
-		this._addButtons(containerID, $likeButton, $cumulativeLikes, $dislikeButton);
-				
+	_createWidget: function(containerID) {
+		var $widget = $('<aside class="likesWidget"><ul></ul></aside>');
+		var $likeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="button balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
+		var $dislikeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="button balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
+		var $cumulativeLikes = $('<p class="likesDisplay"><a class="balloonTooltip"><span class="pointer"><span></span></span> <span class="likesText"></span></a></p>').data('containerID', containerID);
+		
+		$likeButton.appendTo($widget.find('ul'));
+		$dislikeButton.appendTo($widget.find('ul'));
+		$cumulativeLikes.appendTo($widget);
+		this._addWidget(containerID, $widget);
+		
 		this._containerData[containerID].likeButton = $likeButton;
 		this._containerData[containerID].badge = $cumulativeLikes;
 		this._containerData[containerID].dislikeButton = $dislikeButton;
 
 		$likeButton.data('containerID', containerID).data('type', 'like').click($.proxy(this._click, this));
 		$dislikeButton.data('containerID', containerID).data('type', 'dislike').click($.proxy(this._click, this));
+		if (this._containerData[containerID].liked == 1) $likeButton.addClass('active');
+		if (this._containerData[containerID].liked == -1) $dislikeButton.addClass('active');
+		
+		$cumulativeLikes.find('a').click(function() { alert('todo'); });
 		
 		this._updateBadge(containerID);
 	},
@@ -178,7 +184,6 @@ WCF.Like = Class.extend({
 
 		// update label
 		this._updateBadge($containerID);
-		//this._containerData[$containerID].badge.find('span').text((data.returnValues.cumulativeLikes > 0 ? '+' : '') + data.returnValues.cumulativeLikes);
 		
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
@@ -193,13 +198,22 @@ WCF.Like = Class.extend({
 	},
 	
 	_updateBadge: function(containerID) {
-		var $users = this._containerData[containerID].users;
-		var $userArray = [];
-		for (var $userID in $users) $userArray.push($users[$userID]);
-		var $usersString = $userArray.join(', ');
-		
-		if ($usersString) this._containerData[containerID].badge.attr('title', $usersString + ' gefaellt das.');
-		else this._containerData[containerID].badge.attr('title', '');
-		this._containerData[containerID].badge.find('.badge').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') +  this._containerData[containerID].cumulativeLikes);
+		if (!this._containerData[containerID].cumulativeLikes) {
+			this._containerData[containerID].badge.hide();
+		}
+		else {
+			this._containerData[containerID].badge.show();
+			
+			// update like counter
+			this._containerData[containerID].badge.find('.likesText').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
+			// WCF.Language.get('wcf.like.button.tooltip') 
+			// update tooltip
+			var $users = this._containerData[containerID].users;
+			var $userArray = [];
+			for (var $userID in $users) $userArray.push($users[$userID].username);
+			var $usersString = $userArray.join(', ');
+			if ($usersString) this._containerData[containerID].badge.find('a').attr('title', $usersString + ' gefaellt das.').data('tooltip', $usersString + ' gefaellt das.');
+			else this._containerData[containerID].badge.find('a').removeAttr('title').removeData('tooltip');
+		}
 	}
 });
