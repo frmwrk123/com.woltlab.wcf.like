@@ -279,7 +279,7 @@ class LikeHandler extends SingletonFactory {
 		// TODO: create notification
 		
 		return array(
-			'data' =>$this->loadLikeStatus($likeObject, $user),
+			'data' => $this->loadLikeStatus($likeObject, $user),
 			'users' => $users
 		);
 	}
@@ -370,7 +370,8 @@ class LikeHandler extends SingletonFactory {
 					CASE WHEN like_table.likeValue IS NOT NULL THEN like_table.likeValue ELSE 0 END AS liked
 			FROM		wcf".WCF_N."_like_object like_object
 			LEFT JOIN	wcf".WCF_N."_like like_table
-			ON		(like_table.objectID = like_object.objectID
+			ON		(like_table.objectTypeID = ".$likeObject->objectTypeID."
+					AND like_table.objectID = like_object.objectID
 					AND like_table.userID = ?)
 			WHERE		like_object.likeObjectID = ?";
 		$statement = WCF::getDB()->prepareStatement($sql);
