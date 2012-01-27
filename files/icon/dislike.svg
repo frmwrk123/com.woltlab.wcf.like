@@ -15,7 +15,7 @@
 	<defs>
 		<style type="text/css">
 			<![CDATA[
-				.Upper {fill: #f00;}
+				.Upper {fill: #900;}
 				.Lower {fill: #fff;}
 			]]>
 		</style>
