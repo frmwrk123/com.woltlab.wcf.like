@@ -103,10 +103,10 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 */
 	_createWidget: function(containerID) {
-		var $widget = $('<aside class="likesWidget"><ul></ul></aside>');
-		var $likeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="button balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
-		var $dislikeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="button balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
-		var $cumulativeLikes = $('<p class="likesDisplay"><a class="balloonTooltip"><span class="pointer"><span></span></span> <span class="likesText"></span></a></p>').data('containerID', containerID);
+		var $widget = $('<aside class="wcf-likesWidget"><ul></ul></aside>');
+		var $likeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="wcf-button wcf-balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
+		var $dislikeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="wcf-button wcf-balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
+		var $cumulativeLikes = $('<p class="wcf-likesDisplay"><a class="wcf-balloonTooltip"><span class="pointer"><span></span></span> <span class="wcf-likesText"></span></a></p>').data('containerID', containerID);
 		
 		$likeButton.appendTo($widget.find('ul'));
 		$dislikeButton.appendTo($widget.find('ul'));
@@ -215,7 +215,7 @@ WCF.Like = Class.extend({
 			this._containerData[containerID].badge.show();
 			
 			// update like counter
-			this._containerData[containerID].badge.find('.likesText').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
+			this._containerData[containerID].badge.find('.wcf-likesText').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
 			// WCF.Language.get('wcf.like.button.tooltip') 
 			// update tooltip
 			var $users = this._containerData[containerID].users;
