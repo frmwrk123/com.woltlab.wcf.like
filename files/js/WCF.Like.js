@@ -104,9 +104,9 @@ WCF.Like = Class.extend({
 	 */
 	_createWidget: function(containerID) {
 		var $widget = $('<aside class="wcf-likesWidget"><ul></ul></aside>');
-		var $likeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="wcf-button wcf-balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
-		var $dislikeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="wcf-button wcf-balloonTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
-		var $cumulativeLikes = $('<p class="wcf-likesDisplay"><a class="wcf-balloonTooltip"><span class="pointer"><span></span></span> <span class="wcf-likesText"></span></a></p>').data('containerID', containerID);
+		var $likeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="wcf-button jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
+		var $dislikeButton = $('<li><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="wcf-button jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
+		var $cumulativeLikes = $('<p class="wcf-likesDisplay"><a class="jsTooltip"><span class="pointer"><span></span></span> <span class="wcf-likesText"></span></a></p>').data('containerID', containerID);
 		
 		$likeButton.appendTo($widget.find('ul'));
 		$dislikeButton.appendTo($widget.find('ul'));
