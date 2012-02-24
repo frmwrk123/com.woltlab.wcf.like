@@ -205,6 +205,10 @@ WCF.Like = Class.extend({
 			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
 			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
 		}
+		else {
+			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
+			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
+		}
 	},
 	
 	_updateBadge: function(containerID) {
