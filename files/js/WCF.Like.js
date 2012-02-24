@@ -34,32 +34,55 @@ WCF.Like = Class.extend({
 			console.debug("[WCF.Like] Empty container set given, aborting.");
 			return;
 		}
-
-		$containers.each($.proxy(function(index, container) {
-			// set container
-			var $container = $(container);
-			var $containerID = $container.wcfIdentify();
-			this._containers[$containerID] = $container;
-
-			// set container data
-			this._containerData[$containerID] = {
-				'likeButton': null,
-				'badge': null,
-				'dislikeButton': null,
-				'cumulativeLikes': $container.data('like-cumulativeLikes'),
-				'objectType': $container.data('objectType'),
-				'objectID': this._getObjectID($containerID),
-				'users': eval($container.data('like-users')),
-				'liked': $container.data('like-liked')
-			};
-
-			// create UI
-			this._createWidget($containerID);
-		}, this));
-
+		
+		this._initContainers($containers);
+		
 		this._proxy = new WCF.Action.Proxy({
 			success: $.proxy(this._success, this)
 		});
+		
+		// bind dom node inserted listener
+		WCF.DOMNodeInsertedHandler.addCallback('WCF.Like', $.proxy(this._domNodeInserted, this));
+	},
+	
+	/**
+	 * Initialize containers once new nodes are inserted.
+	 */
+	_domNodeInserted: function() {
+		var $containers = this._getContainers();
+		this._initContainers($containers);
+	},
+	
+	/**
+	 * Initializes like containers.
+	 * 
+	 * @param	object		containers
+	 */
+	_initContainers: function(containers) {
+		containers.each($.proxy(function(index, container) {
+			// set container
+			var $container = $(container);
+			var $containerID = $container.wcfIdentify();
+			
+			if (!this._containers[$containerID]) {
+				this._containers[$containerID] = $container;
+				
+				// set container data
+				this._containerData[$containerID] = {
+					'likeButton': null,
+					'badge': null,
+					'dislikeButton': null,
+					'cumulativeLikes': $container.data('like-cumulativeLikes'),
+					'objectType': $container.data('objectType'),
+					'objectID': this._getObjectID($containerID),
+					'users': eval($container.data('like-users')),
+					'liked': $container.data('like-liked')
+				};
+				
+				// create UI
+				this._createWidget($containerID);
+			}
+		}, this));
 	},
 
 	/**
