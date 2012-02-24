@@ -30,11 +30,6 @@ WCF.Like = Class.extend({
 	 */
 	init: function() {
 		var $containers = this._getContainers();
-		if ($containers.length === 0) {
-			console.debug("[WCF.Like] Empty container set given, aborting.");
-			return;
-		}
-		
 		this._initContainers($containers);
 		
 		this._proxy = new WCF.Action.Proxy({
@@ -254,7 +249,13 @@ WCF.Like = Class.extend({
 			this._containerData[containerID].badge.show();
 			
 			// update like counter
-			this._containerData[containerID].badge.find('.wcf-likesText').text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
+			var $likesText = this._containerData[containerID].badge.find('.wcf-likesText');
+			$likesText.text((this._containerData[containerID].cumulativeLikes));
+			$likesText.removeClass('wcf-liked wcf-disliked');
+			if (this._containerData[containerID].cumulativeLikes) {
+				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'wcf-liked' : 'wcf-disliked'));
+			}
+			
 			// WCF.Language.get('wcf.like.button.tooltip') 
 			// update tooltip
 			var $users = this._containerData[containerID].users;
