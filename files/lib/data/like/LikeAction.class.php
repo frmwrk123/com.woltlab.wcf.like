@@ -3,6 +3,7 @@ namespace wcf\data\like;
 use wcf\data\AbstractDatabaseObjectAction;
 use wcf\system\exception\ValidateActionException;
 use wcf\system\like\LikeHandler;
+use wcf\system\user\activity\event\UserActivityEventHandler;
 use wcf\system\WCF;
 
 /**
@@ -57,6 +58,14 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		if (!isset($this->parameters['data']['objectType'])) {
 			throw new ValidateActionException("missing parameter 'objectType'.");
 		}
+		if (LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']) === null) {
+			throw new ValidateActionException("invalid objectType given.");
+		}
+		
+		// todo: check permissions
+		if (!WCF::getUser()->userID/* || !WCF::getSession()->getPermission('user.like.canLike')*/) {
+			throw new ValidateActionException("insufficient permisions");	
+		}
 	}
 	
 	/**
@@ -92,6 +101,13 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		$likeableObject = $objectProvider->getObjectByID($this->parameters['data']['objectID']);
 		$likeableObject->setObjectType($objectType);
 		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), $likeValue);
+		
+		// fire activity event
+		if ($likeData['data']['liked'] == 1) {
+			if (UserActivityEventHandler::getInstance()->getObjectTypeID($objectType->objectType.'.recentActivityEvent')) {
+				UserActivityEventHandler::getInstance()->fireEvent($objectType->objectType.'.recentActivityEvent', $objectType->packageID, $this->parameters['data']['objectID']);
+			}
+		}
 		
 		// get stats
 		return array(

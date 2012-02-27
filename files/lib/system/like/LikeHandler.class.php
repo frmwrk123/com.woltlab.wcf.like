@@ -280,6 +280,7 @@ class LikeHandler extends SingletonFactory {
 		
 		return array(
 			'data' => $this->loadLikeStatus($likeObject, $user),
+			'like' => $like,
 			'users' => $users
 		);
 	}
