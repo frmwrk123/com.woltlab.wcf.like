@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package name="com.woltlab.wcf.like" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/package.xsd">
+<package name="com.woltlab.wcf.like" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/maelstrom/package.xsd">
 	<packageinformation>
 		<packagename>Like System</packagename>
 		<packagedescription>Description was eaten by a horde of monkeys. NOES!</packagedescription>
@@ -23,5 +23,7 @@
 		<instruction type="objectTypeDefinition">objectTypeDefinition.xml</instruction>
 		<instruction type="templateListener">templatelistener.xml</instruction>
 		<instruction type="language">language/*.xml</instruction>
+		<instruction type="option">option.xml</instruction>
+		<instruction type="userGroupOption">groupoptions.xml</instruction>
 	</instructions>
 </package>

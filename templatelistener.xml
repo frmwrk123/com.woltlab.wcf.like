@@ -5,21 +5,21 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptInclude</eventname>
-			<templatecode><![CDATA[<script type="text/javascript" src="{@$__wcf->getPath('wcf')}js/WCF.Like.js"></script>]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE}<script type="text/javascript" src="{@$__wcf->getPath('wcf')}js/WCF.Like.js"></script>{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="javascriptLanguageImport">
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptLanguageImport</eventname>
-			<templatecode><![CDATA[,'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.button.tooltip': '{lang}wcf.like.button.tooltip{/lang}']]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.button.tooltip': '{lang}wcf.like.button.tooltip{/lang}'{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="javascriptIconImport">
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptIconImport</eventname>
-			<templatecode><![CDATA[,'wcf.icon.like': '{icon}like1{/icon}','wcf.icon.dislike': '{icon}dislike1{/icon}','wcf.icon.like.active': '{icon}like{/icon}','wcf.icon.dislike.active': '{icon}dislike{/icon}']]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.icon.like': '{icon}like1{/icon}','wcf.icon.dislike': '{icon}dislike1{/icon}','wcf.icon.like.active': '{icon}like{/icon}','wcf.icon.dislike.active': '{icon}dislike{/icon}'{/if}]]></templatecode>
 		</templatelistener>
 	</import>
 </data>

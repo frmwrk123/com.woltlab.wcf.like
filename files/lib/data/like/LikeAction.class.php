@@ -47,6 +47,10 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	 * Validates parameters for like-related actions.
 	 */
 	public function validateLike() {
+		if (!MODULE_LIKE) {
+			throw new ValidateActionException("like module disabled");
+		}
+		
 		if (!isset($this->parameters['data']['containerID'])) {
 			throw new ValidateActionException("missing parameter 'containerID'.");
 		}
@@ -62,8 +66,8 @@ class LikeAction extends AbstractDatabaseObjectAction {
 			throw new ValidateActionException("invalid objectType given.");
 		}
 		
-		// todo: check permissions
-		if (!WCF::getUser()->userID/* || !WCF::getSession()->getPermission('user.like.canLike')*/) {
+		// check permissions
+		if (!WCF::getUser()->userID || !WCF::getSession()->getPermission('user.like.canLike')) {
 			throw new ValidateActionException("insufficient permisions");	
 		}
 	}

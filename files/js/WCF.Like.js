@@ -20,15 +20,21 @@ WCF.Like = Class.extend({
 
 	/**
 	 * proxy object
-	 * 
 	 * @var	WCF.Action.Proxy
 	 */
 	_proxy: null,
 	
 	/**
+	 * user can like 
+	 * @var boolean
+	 */
+	_canLike: false,
+	
+	/**
 	 * Initializes like support.
 	 */
-	init: function() {
+	init: function(canLike) {
+		this._canLike = canLike;
 		var $containers = this._getContainers();
 		this._initContainers($containers);
 		
@@ -125,8 +131,10 @@ WCF.Like = Class.extend({
 	 */
 	_buildWidget: function(containerID, likeButton, dislikeButton, cumulativeLikes) {
 		var $widget = $('<aside class="wcf-likesWidget"><ul></ul></aside>');
-		dislikeButton.appendTo($widget.find('ul'));
-		likeButton.appendTo($widget.find('ul'));
+		if (this._canLike) {
+			dislikeButton.appendTo($widget.find('ul'));
+			likeButton.appendTo($widget.find('ul'));
+		}
 		cumulativeLikes.appendTo($widget);
 		
 		this._addWidget(containerID, $widget); 

@@ -5,4 +5,8 @@
 		<item name="wcf.like.button.like"><![CDATA[Gefällt mir]]></item>
 		<item name="wcf.like.button.dislike"><![CDATA[Gefällt mir nicht]]></item>
 	</category>
+	
+	<category name="wcf.acp.option">
+		<item name="wcf.acp.option.module_like"><![CDATA[Like-System aktivieren]]></item>
+	</category>
 </language>
