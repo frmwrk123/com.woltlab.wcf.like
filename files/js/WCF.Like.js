@@ -259,9 +259,9 @@ WCF.Like = Class.extend({
 			// update like counter
 			var $likesText = this._containerData[containerID].badge.find('.wcf-likesText');
 			$likesText.text((this._containerData[containerID].cumulativeLikes));
-			$likesText.removeClass('wcf-badgeSuccess wcf-badgeError');
+			$likesText.removeClass('wcf-badgeGreen wcf-badgeRed');
 			if (this._containerData[containerID].cumulativeLikes) {
-				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'wcf-badgeSuccess' : 'wcf-badgeError'));
+				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'wcf-badgeGreen' : 'wcf-badgeRed'));
 			}
 			
 			// WCF.Language.get('wcf.like.button.tooltip') 
