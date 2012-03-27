@@ -322,16 +322,17 @@ class LikeHandler extends SingletonFactory {
 			
 		$users = $likeObject->getUsers();
 		$usersArray = array();
-		foreach ($users as $user) {
-			$usersArray[$user->userID] = array('userID' => $user->userID, 'username' => $user->username);
+		foreach ($users as $user2) {
+			$usersArray[$user2->userID] = array('userID' => $user2->userID, 'username' => $user2->username);
 		}
+		
 		if (isset($usersArray[$user->userID])) {
 			unset($usersArray[$user->userID]);
 			$updateData['cachedUsers'] = serialize($usersArray);
 		}
 			
 		$likeObjectEditor = new LikeObjectEditor($likeObject);
-		if (empty($usersArray)) {
+		if (!$updateData['likes'] && !$updateData['dislikes']) {
 			// remove object instead
 			$likeObjectEditor->delete();
 		}
