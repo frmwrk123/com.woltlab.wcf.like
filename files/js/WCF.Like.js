@@ -223,7 +223,7 @@ WCF.Like = Class.extend({
 		}
 		
 		// update container data
-		this._containerData[$containerID].cumulativeLikes = data.returnValues.cumulativeLikes;
+		this._containerData[$containerID].cumulativeLikes = parseInt(data.returnValues.cumulativeLikes);
 		this._containerData[$containerID].users = data.returnValues.users;
 
 		// update label
