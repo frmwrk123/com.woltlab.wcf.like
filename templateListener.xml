@@ -21,5 +21,13 @@
 			<eventname>javascriptIconImport</eventname>
 			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.icon.like': '{icon}like1{/icon}','wcf.icon.dislike': '{icon}dislike1{/icon}','wcf.icon.like.active': '{icon}like{/icon}','wcf.icon.dislike.active': '{icon}dislike{/icon}'{/if}]]></templatecode>
 		</templatelistener>
+		
+		<templatelistener name="userInformationStatistics">
+			<environment>user</environment>
+			<templatename>userInformation</templatename>
+			<eventname>statistics</eventname>
+			<templatecode><![CDATA[{if MODULE_LIKE}<dt>{lang}wcf.like.likesReceived{/lang}</dt>
+<dd>{#$user->likes}</dd>{/if}]]></templatecode>
+		</templatelistener>
 	</import>
 </data>
