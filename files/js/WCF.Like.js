@@ -146,9 +146,9 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 */
 	_createWidget: function(containerID) {
-		var $likeButton = $('<li class="wcf-likeButton"><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
-		var $dislikeButton = $('<li class="wcf-dislikeButton"><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
-		var $cumulativeLikes = $('<p class="wcf-likesDisplay"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="wcf-likesText wcf-badge jsTooltip"></span></p>').data('containerID', containerID);
+		var $likeButton = $('<li class="likeButton"><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
+		var $dislikeButton = $('<li class="dislikeButton"><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
+		var $cumulativeLikes = $('<p class="likesDisplay"><span class="likesText badge jsTooltip"></span></p>').data('containerID', containerID);
 		this._buildWidget(containerID, $likeButton, $dislikeButton, $cumulativeLikes);
 		
 		this._containerData[containerID].likeButton = $likeButton;
@@ -257,11 +257,11 @@ WCF.Like = Class.extend({
 			this._containerData[containerID].badge.show();
 			
 			// update like counter
-			var $likesText = this._containerData[containerID].badge.find('.wcf-likesText');
-			$likesText.text((this._containerData[containerID].cumulativeLikes));
-			$likesText.removeClass('wcf-badgeGreen wcf-badgeRed');
+			var $likesText = this._containerData[containerID].badge.find('.likesText');
+			$likesText.text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
+			$likesText.removeClass('badgeGreen badgeRed');
 			if (this._containerData[containerID].cumulativeLikes) {
-				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'wcf-badgeGreen' : 'wcf-badgeRed'));
+				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'badgeGreen' : 'badgeRed'));
 			}
 			
 			// WCF.Language.get('wcf.like.button.tooltip') 
@@ -270,11 +270,8 @@ WCF.Like = Class.extend({
 			var $userArray = [];
 			for (var $userID in $users) $userArray.push($users[$userID].username);
 			var $usersString = $userArray.join(', ');
-			if ($usersString) this._containerData[containerID].badge.find('.wcf-likesText').attr('title', $usersString + ' gefaellt das.').data('tooltip', $usersString + ' gefaellt das.');
-			else this._containerData[containerID].badge.find('.wcf-likesText').removeAttr('title').removeData('tooltip');
-			
-			var $icon = WCF.Icon.get('wcf.icon.'+(this._containerData[containerID].cumulativeLikes > 0 ? 'like' : 'dislike'));
-			this._containerData[containerID].badge.find('img').attr('src', $icon);
+			if ($usersString) this._containerData[containerID].badge.find('.likesText').attr('title', $usersString + ' gefaellt das.').data('tooltip', $usersString + ' gefaellt das.');
+			else this._containerData[containerID].badge.find('.likesText').removeAttr('title').removeData('tooltip');
 		}
 	}
 });
