@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/maelstrom/language.xsd" languagecode="de">
 	<category name="wcf.like">
-		<item name="wcf.like.cumulativeLikes"><![CDATA[Beliebtheit]]></item>
+		<item name="wcf.like.cumulativeLikes"><![CDATA[Likes]]></item>
 		<item name="wcf.like.button.like"><![CDATA[Gefällt mir]]></item>
 		<item name="wcf.like.button.dislike"><![CDATA[Gefällt mir nicht]]></item>
-		<item name="wcf.like.likesReceived"><![CDATA[&raquo;Gefällt mir&laquo; erhalten]]></item>
+		<item name="wcf.like.likesReceived"><![CDATA[Likes erhalten]]></item>
 	</category>
 	
 	<category name="wcf.acp.option">
-		<item name="wcf.acp.option.module_like"><![CDATA[&raquo;Gefällt mir&laquo;-System aktivieren]]></item>
+		<item name="wcf.acp.option.module_like"><![CDATA[Like-System aktivieren]]></item>
 	</category>
 </language>
