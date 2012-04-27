@@ -31,17 +31,29 @@ WCF.Like = Class.extend({
 	_canLike: false,
 	
 	/**
+	 * shows the detailed summary of users who liked the object
+	 */
+	_showSummary: true,
+	
+	/**
+	 * enables the dislike option
+	 */
+	_enableDislikes: true,
+	
+	/**
 	 * Initializes like support.
 	 */
-	init: function(canLike) {
+	init: function(canLike, enableDislikes, showSummery) {
 		this._canLike = canLike;
+		this._enableDislikes = enableDislikes;
+		this._showSummary = showSummery;
 		var $containers = this._getContainers();
 		this._initContainers($containers);
 		
 		this._proxy = new WCF.Action.Proxy({
 			success: $.proxy(this._success, this)
 		});
-		
+	
 		// bind dom node inserted listener
 		WCF.DOMNodeInsertedHandler.addCallback('WCF.Like', $.proxy(this._domNodeInserted, this));
 	},
@@ -73,7 +85,8 @@ WCF.Like = Class.extend({
 					'likeButton': null,
 					'badge': null,
 					'dislikeButton': null,
-					'cumulativeLikes': $container.data('like-cumulativeLikes'),
+					'likes': $container.data('like-likes'),
+					'dislikes': $container.data('like-dislikes'),
 					'objectType': $container.data('objectType'),
 					'objectID': this._getObjectID($containerID),
 					'users': eval($container.data('like-users')),
@@ -127,15 +140,16 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 * @param	jQuery		likeButton
 	 * @param	jQuery		dislikeButton
-	 * @param	jQuery		cumulativeLikes
+	 * @param	jQuery		badge
+	 * @param	jQuery		summary
 	 */
-	_buildWidget: function(containerID, likeButton, dislikeButton, cumulativeLikes) {
-		var $widget = $('<aside class="wcf-likesWidget"><ul></ul></aside>');
+	_buildWidget: function(containerID, likeButton, dislikeButton, badge, summary) {
+		var $widget = $('<aside class="likesWidget"><ul></ul></aside>');
 		if (this._canLike) {
 			dislikeButton.appendTo($widget.find('ul'));
 			likeButton.appendTo($widget.find('ul'));
 		}
-		cumulativeLikes.appendTo($widget);
+		badge.appendTo($widget);
 		
 		this._addWidget(containerID, $widget); 
 	},
@@ -148,13 +162,16 @@ WCF.Like = Class.extend({
 	_createWidget: function(containerID) {
 		var $likeButton = $('<li class="likeButton"><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
 		var $dislikeButton = $('<li class="dislikeButton"><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
-		var $cumulativeLikes = $('<p class="likesDisplay"><span class="likesText badge jsTooltip"></span></p>').data('containerID', containerID);
-		this._buildWidget(containerID, $likeButton, $dislikeButton, $cumulativeLikes);
+		var $badge = $('<a class="badge jsTooltip likesBadge"></a>');
+		if (this._showSummary) var $summary = $('<p class="likesSummary"></p>');
+		this._buildWidget(containerID, $likeButton, $dislikeButton, $badge, $summary);
+		if (!this._enableDislikes) $dislikeButton.hide();
 		
 		this._containerData[containerID].likeButton = $likeButton;
-		this._containerData[containerID].badge = $cumulativeLikes;
 		this._containerData[containerID].dislikeButton = $dislikeButton;
-
+		this._containerData[containerID].badge = $badge;
+		this._containerData[containerID].summary = $summary;
+		
 		$likeButton.data('containerID', containerID).data('type', 'like').click($.proxy(this._click, this));
 		$dislikeButton.data('containerID', containerID).data('type', 'dislike').click($.proxy(this._click, this));
 		if (this._containerData[containerID].liked == 1) {
@@ -166,9 +183,8 @@ WCF.Like = Class.extend({
 			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
 		}
 		
-		$cumulativeLikes.find('a').click(function() { alert('todo'); });
-		
 		this._updateBadge(containerID);
+		if (this._showSummary) this._updateSummary(containerID);
 	},
 	
 	/**
@@ -223,11 +239,14 @@ WCF.Like = Class.extend({
 		}
 		
 		// update container data
-		this._containerData[$containerID].cumulativeLikes = parseInt(data.returnValues.cumulativeLikes);
+		this._containerData[$containerID].likes = parseInt(data.returnValues.likes);
+		this._containerData[$containerID].dislikes = parseInt(data.returnValues.dislikes);
 		this._containerData[$containerID].users = data.returnValues.users;
 
 		// update label
 		this._updateBadge($containerID);
+		// update summary
+		if (this._showSummary) this._updateSummary($containerID);
 		
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
@@ -250,28 +269,48 @@ WCF.Like = Class.extend({
 	},
 	
 	_updateBadge: function(containerID) {
-		if (!this._containerData[containerID].cumulativeLikes) {
+		if (!this._containerData[containerID].likes && !this._containerData[containerID].dislikes) {
 			this._containerData[containerID].badge.hide();
 		}
 		else {
 			this._containerData[containerID].badge.show();
 			
 			// update like counter
-			var $likesText = this._containerData[containerID].badge.find('.likesText');
-			$likesText.text((this._containerData[containerID].cumulativeLikes > 0 ? '+' : '') + this._containerData[containerID].cumulativeLikes);
-			$likesText.removeClass('badgeGreen badgeRed');
-			if (this._containerData[containerID].cumulativeLikes) {
-				$likesText.addClass((this._containerData[containerID].cumulativeLikes > 0 ? 'badgeGreen' : 'badgeRed'));
+			var $cumulativeLikes = this._containerData[containerID].likes - this._containerData[containerID].dislikes;
+			var $badge = this._containerData[containerID].badge;
+			$badge.removeClass('badgeGreen badgeRed');
+			if ($cumulativeLikes > 0) {
+				$badge.text('+' + $cumulativeLikes);
+				$badge.addClass('badgeGreen');
+			}
+			else if ($cumulativeLikes < 0) {
+				$badge.text($cumulativeLikes);
+				$badge.addClass('badgeRed');
+			}
+			else {
+				$badge.text('±0');
 			}
 			
-			// WCF.Language.get('wcf.like.button.tooltip') 
 			// update tooltip
+			var $likes = this._containerData[containerID].likes;
+			var $dislikes = this._containerData[containerID].dislikes;
+			$badge.data('tooltip', eval(WCF.Language.get('wcf.like.tooltip')));
+		}
+	},
+	
+	_updateSummary: function(containerID) {
+		if (!this._containerData[containerID].likes) {
+			this._containerData[containerID].summary.hide();
+		}
+		else {
+			this._containerData[containerID].summary.show();
+			
 			var $users = this._containerData[containerID].users;
 			var $userArray = [];
 			for (var $userID in $users) $userArray.push($users[$userID].username);
-			var $usersString = $userArray.join(', ');
-			if ($usersString) this._containerData[containerID].badge.find('.likesText').attr('title', $usersString + ' gefaellt das.').data('tooltip', $usersString + ' gefaellt das.');
-			else this._containerData[containerID].badge.find('.likesText').removeAttr('title').removeData('tooltip');
+			var $others = this._containerData[containerID].likes - $userArray.length;
+			
+			this._containerData[containerID].summary.text(eval(WCF.Language.get('wcf.like.summary')));
 		}
 	}
 });

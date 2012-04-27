@@ -12,7 +12,7 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptLanguageImport</eventname>
-			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.button.tooltip': '{lang}wcf.like.button.tooltip{/lang}'{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.tooltip': '{lang}wcf.like.jsTooltip{/lang}','wcf.like.summary': '{lang}wcf.like.summary{/lang}'{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="javascriptIconImport">
@@ -27,7 +27,7 @@
 			<templatename>userInformation</templatename>
 			<eventname>statistics</eventname>
 			<templatecode><![CDATA[{if MODULE_LIKE}<dt>{lang}wcf.like.likesReceived{/lang}</dt>
-<dd>{#$user->likes}</dd>{/if}]]></templatecode>
+<dd>{#$user->likesReceived}</dd>{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="userStatistics">
@@ -35,7 +35,7 @@
 			<templatename>user</templatename>
 			<eventname>statistics</eventname>
 			<templatecode><![CDATA[{if MODULE_LIKE}<dt>{lang}wcf.like.likesReceived{/lang}</dt>
-<dd>{#$user->likes}</dd>{/if}]]></templatecode>
+<dd>{#$user->likesReceived}</dd>{/if}]]></templatecode>
 		</templatelistener>
 	</import>
 </data>

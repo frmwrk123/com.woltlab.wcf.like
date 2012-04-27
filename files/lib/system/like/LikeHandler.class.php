@@ -243,13 +243,13 @@ class LikeHandler extends SingletonFactory {
 			if ($like->likeID) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
 				$userEditor->update(array(
-					'likes' => ($like->likeValue == Like::LIKE) ? $userEditor->likes - 1 : $userEditor->likes + 1
+					'likesReceived' => ($like->likeValue == Like::LIKE) ? $userEditor->likes - 1 : $userEditor->likes + 1
 				));
 			}
 			else if ($likeValue == Like::LIKE) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
 				$userEditor->update(array(
-					'likes' => $userEditor->likes + 1
+					'likesReceived' => $userEditor->likes + 1
 				));
 			}
 		}
@@ -346,7 +346,7 @@ class LikeHandler extends SingletonFactory {
 			if ($like->likeValue == Like::LIKE) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
 				$userEditor->update(array(
-					'likes' => $user->likes - 1
+					'likesReceived' => $user->likes - 1
 				));
 			}
 		}
