@@ -43,10 +43,10 @@ WCF.Like = Class.extend({
 	/**
 	 * Initializes like support.
 	 */
-	init: function(canLike, enableDislikes, showSummery) {
+	init: function(canLike, enableDislikes, showSummary) {
 		this._canLike = canLike;
 		this._enableDislikes = enableDislikes;
-		this._showSummary = showSummery;
+		this._showSummary = showSummary;
 		var $containers = this._getContainers();
 		this._initContainers($containers);
 		
