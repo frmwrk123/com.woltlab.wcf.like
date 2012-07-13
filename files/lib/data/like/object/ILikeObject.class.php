@@ -3,6 +3,7 @@ namespace wcf\data\like\object;
 use wcf\data\like\Like;
 use wcf\data\object\type\ObjectType;
 use wcf\data\IDatabaseObjectProcessor;
+use wcf\data\ITitledDatabaseObject;
 
 /**
  * Any likeable object should implement this interface.
@@ -14,14 +15,7 @@ use wcf\data\IDatabaseObjectProcessor;
  * @subpackage	data.like.object
  * @category 	Community Framework
  */
-interface ILikeObject extends IDatabaseObjectProcessor {
-	/**
-	 * Returns the title of this likeable.
-	 * 
-	 * @return	string
-	 */
-	public function getTitle();
-	
+interface ILikeObject extends IDatabaseObjectProcessor, ITitledDatabaseObject {
 	/**
 	 * Returns the url to this likeable.
 	 * 
