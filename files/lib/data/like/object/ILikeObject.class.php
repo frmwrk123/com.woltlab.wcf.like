@@ -1,6 +1,5 @@
 <?php
 namespace wcf\data\like\object;
-use wcf\data\like\Like;
 use wcf\data\object\type\ObjectType;
 use wcf\data\IDatabaseObjectProcessor;
 use wcf\data\ITitledDatabaseObject;
