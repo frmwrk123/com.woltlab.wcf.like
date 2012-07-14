@@ -1,6 +1,5 @@
 <?php
 namespace wcf\data\like\object\type;
-use wcf\data\DatabaseObject;
 use wcf\data\ProcessibleDatabaseObject;
 
 /**
@@ -24,5 +23,8 @@ class LikeObjectType extends ProcessibleDatabaseObject {
 	 */
 	protected static $databaseTableIndexName = 'likeObjectTypeID';
 	
+	/**
+	 * @see	wcf\data\ProcessibleDatabaseObject::$processorInterface
+	 */
 	protected static $processorInterface = 'wcf\data\like\object\type\ILikeObjectType';
 }
