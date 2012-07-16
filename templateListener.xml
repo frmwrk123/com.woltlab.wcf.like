@@ -37,5 +37,12 @@
 			<templatecode><![CDATA[{if MODULE_LIKE}<dt>{lang}wcf.like.likesReceived{/lang}</dt>
 <dd>{#$user->likesReceived}</dd>{/if}]]></templatecode>
 		</templatelistener>
+		
+		<templatelistener name="membersList">
+			<environment>user</environment>
+			<templatename>membersList</templatename>
+			<eventname>sortField</eventname>
+			<templatecode><![CDATA[<option value="likesReceived"{if $sortField == 'likesReceived'} selected="selected"{/if}>{lang}wcf.like.likesReceived{/lang}</option>]]></templatecode>
+		</templatelistener>
 	</import>
 </data>
