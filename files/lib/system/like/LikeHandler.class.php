@@ -11,6 +11,7 @@ use wcf\data\user\User;
 use wcf\data\user\UserEditor;
 use wcf\system\cache\CacheHandler;
 use wcf\system\database\util\PreparedStatementConditionBuilder;
+use wcf\system\user\activity\point\UserActivityPointHandler;
 use wcf\system\SingletonFactory;
 use wcf\system\WCF;
 
@@ -245,12 +246,18 @@ class LikeHandler extends SingletonFactory {
 				$userEditor->update(array(
 					'likesReceived' => ($like->likeValue == Like::LIKE) ? $userEditor->likes - 1 : $userEditor->likes + 1
 				));
+				
+				if ($like->likeValue == Like::LIKE) {
+					UserActivityPointHandler::getInstance()->removeEvents('com.woltlab.wcf.like.activityPointEvent.receivedLikes', array($like->likeID));
+				}
 			}
 			else if ($likeValue == Like::LIKE) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
 				$userEditor->update(array(
 					'likesReceived' => $userEditor->likes + 1
 				));
+				
+				UserActivityPointHandler::getInstance()->fireEvent('com.woltlab.wcf.like.activityPointEvent.receivedLikes', $like->likeID, $likeable->getUserID());
 			}
 		}
 		
@@ -341,7 +348,7 @@ class LikeHandler extends SingletonFactory {
 			$likeObjectEditor->update($updateData);
 		}
 		
-		// update owner's like counter
+		// update owner's like counter and activity points
 		if ($likeable->getUserID()) {
 			if ($like->likeValue == Like::LIKE) {
 				$userEditor = new UserEditor(new User($likeable->getUserID()));
@@ -349,6 +356,8 @@ class LikeHandler extends SingletonFactory {
 					'likesReceived' => $user->likes - 1
 				));
 			}
+			
+			UserActivityPointHandler::getInstance()->removeEvents('com.woltlab.wcf.like.activityPointEvent.receivedLikes', array($like->likeID));
 		}
 		
 		// update object's like counter
