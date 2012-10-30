@@ -25,7 +25,6 @@ CREATE TABLE wcf1_like_object (
 	UNIQUE KEY (objectTypeID, objectID)
 );
 
-
 ALTER TABLE wcf1_like ADD FOREIGN KEY (objectTypeID) REFERENCES wcf1_object_type (objectTypeID) ON DELETE CASCADE;
 ALTER TABLE wcf1_like ADD FOREIGN KEY (userID) REFERENCES wcf1_user (userID) ON DELETE CASCADE;
 ALTER TABLE wcf1_like ADD FOREIGN KEY (objectUserID) REFERENCES wcf1_user (userID) ON DELETE SET NULL;

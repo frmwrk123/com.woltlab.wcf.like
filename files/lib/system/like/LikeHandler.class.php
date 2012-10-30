@@ -9,7 +9,6 @@ use wcf\data\object\type\ObjectType;
 use wcf\data\object\type\ObjectTypeCache;
 use wcf\data\user\User;
 use wcf\data\user\UserEditor;
-use wcf\system\cache\CacheHandler;
 use wcf\system\database\util\PreparedStatementConditionBuilder;
 use wcf\system\user\activity\point\UserActivityPointHandler;
 use wcf\system\SingletonFactory;
@@ -27,16 +26,16 @@ use wcf\system\WCF;
  * $likeObjects = LikeHandler::getInstance()->getLikeObjects($objectType);
  *
  * @author	Marcel Werk
- * @copyright	2009-2011 WoltLab GmbH
+ * @copyright	2001-2012 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
  * @subpackage	system.like
- * @category 	Community Framework
+ * @category	Community Framework
  */
 class LikeHandler extends SingletonFactory {
 	/**
 	 * loaded like objects
-	 * @var array<array>
+	 * @var	array<array>
 	 */
 	protected $likeObjectCache = array();
 	
@@ -68,10 +67,10 @@ class LikeHandler extends SingletonFactory {
 	}
 	
 	/**
-	 * Gets a like object. 
+	 * Gets a like object.
 	 * 
-	 * @param	wcf\data\object\type\ObjectType	$objectType
-	 * @param	integer				$objectID
+	 * @param	wcf\data\object\type\ObjectType		$objectType
+	 * @param	integer					$objectID
 	 * @return	wcf\data\like\object\LikeObject
 	 */
 	public function getLikeObject(ObjectType $objectType, $objectID) {
@@ -83,7 +82,7 @@ class LikeHandler extends SingletonFactory {
 	}
 	
 	/**
-	 * Gets the like objects of a specific object type. 
+	 * Gets the like objects of a specific object type.
 	 * 
 	 * @param	wcf\data\object\type\ObjectType		$objectType
 	 * @return	array<wcf\data\like\object\LikeObject>
@@ -97,11 +96,12 @@ class LikeHandler extends SingletonFactory {
 	}
 	
 	/**
-	 * Loads the like data for a set of objects.
+	 * Loads the like data for a set of objects and returns the number of loaded
+	 * like objects
 	 * 
-	 * @param	wcf\data\object\type\ObjectType	$objectType
-	 * @param	array				$objectIDs
-	 * @return	integer				number of loaded result sets
+	 * @param	wcf\data\object\type\ObjectType		$objectType
+	 * @param	array					$objectIDs
+	 * @return	integer
 	 */
 	public function loadLikeObjects(ObjectType $objectType, array $objectIDs) {
 		$i = 0;
@@ -145,8 +145,8 @@ class LikeHandler extends SingletonFactory {
 	 * @param	wcf\data\like\object\ILikeObject	$likeable
 	 * @param	wcf\data\user\User			$user
 	 * @param	integer					$likeValue
-	 * @param	integer					$time	
-	 * @return	array	
+	 * @param	integer					$time
+	 * @return	array
 	 */
 	public function like(ILikeObject $likeable, User $user, $likeValue, $time = TIME_NOW) {
 		// verify if object is already liked by user
@@ -308,7 +308,7 @@ class LikeHandler extends SingletonFactory {
 		$likes = $likeObject->likes;
 		$dislikes = $likeObject->dislikes;
 		$cumulativeLikes = $likeObject->cumulativeLikes;
-			
+		
 		if ($like->likeValue == Like::LIKE) {
 			$likes--;
 			$cumulativeLikes--;
@@ -317,14 +317,14 @@ class LikeHandler extends SingletonFactory {
 			$dislikes--;
 			$cumulativeLikes++;
 		}
-			
+		
 		// build update data
 		$updateData = array(
 			'likes' => $likes,
 			'dislikes' => $dislikes,
 			'cumulativeLikes' => $cumulativeLikes
 		);
-			
+		
 		$users = $likeObject->getUsers();
 		$usersArray = array();
 		foreach ($users as $user2) {
@@ -335,7 +335,7 @@ class LikeHandler extends SingletonFactory {
 			unset($usersArray[$user->userID]);
 			$updateData['cachedUsers'] = serialize($usersArray);
 		}
-			
+		
 		$likeObjectEditor = new LikeObjectEditor($likeObject);
 		if (!$updateData['likes'] && !$updateData['dislikes']) {
 			// remove object instead
@@ -373,7 +373,7 @@ class LikeHandler extends SingletonFactory {
 	 * @param	wcf\data\like\object\LikeObject		$likeObject
 	 * @param	wcf\data\user\User			$user
 	 * @return	array
-	 */	
+	 */
 	protected function loadLikeStatus(LikeObject $likeObject, User $user) {
 		$sql = "SELECT		like_object.likes, like_object.dislikes, like_object.cumulativeLikes,
 					CASE WHEN like_table.likeValue IS NOT NULL THEN like_table.likeValue ELSE 0 END AS liked

@@ -14,12 +14,17 @@ use wcf\system\WCF;
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
  * @subpackage	system.user.activity.point
- * @category 	Community Framework
+ * @category	Community Framework
  */
 class ReceivedLikesUserActivityPointObjectProcessor implements IUserActivityPointObjectProcessor {
 	public $limit = 500;
 	public $objectType = null;
 	
+	/**
+	 * Creates a new instance of ReceivedLikesUserActivityPointObjectProcessor.
+	 * 
+	 * @param	wcf\data\object\type\ObjectType		$objectType
+	 */
 	public function __construct(ObjectType $objectType) {
 		$this->objectType = $objectType;
 	}
@@ -76,17 +81,16 @@ class ReceivedLikesUserActivityPointObjectProcessor implements IUserActivityPoin
 			$conditionBuilder = new PreparedStatementConditionBuilder();
 			$conditionBuilder->add("likeID IN (?)", array($likeIDs));
 			// use INSERT … SELECT as this makes bulk updating easier
-			$sql = "INSERT INTO 
-					wcf".WCF_N."_user_activity_point_event (userID, objectTypeID, objectID, additionalData)
-					
-					SELECT	objectUserID AS userID,
+			$sql = "INSERT INTO	wcf".WCF_N."_user_activity_point_event
+						(userID, objectTypeID, objectID, additionalData)
+				SELECT		objectUserID AS userID,
 						?,
 						likeID AS objectID,
 						?
-					FROM	wcf".WCF_N."_like
-					".$conditionBuilder;
+				FROM	wcf".WCF_N."_like
+				".$conditionBuilder;
 			$statement = WCF::getDB()->prepareStatement($sql);
-			$statement->execute(array_merge((array) $this->objectType->objectTypeID, (array) serialize(array()), $conditionBuilder->getParameters()));
+			$statement->execute(array_merge(array($this->objectType->objectTypeID, serialize(array())), $conditionBuilder->getParameters()));
 		}
 	}
 }

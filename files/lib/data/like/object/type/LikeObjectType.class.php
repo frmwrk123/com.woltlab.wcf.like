@@ -4,13 +4,13 @@ use wcf\data\ProcessibleDatabaseObject;
 
 /**
  * Represents a type of liked object.
- *
+ * 
  * @author	Marcel Werk
- * @copyright	2001-2011 WoltLab GmbH
+ * @copyright	2001-2012 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
  * @subpackage	data.like.object.type
- * @category 	Community Framework
+ * @category	Community Framework
  */
 class LikeObjectType extends ProcessibleDatabaseObject {
 	/**
