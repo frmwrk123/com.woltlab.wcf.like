@@ -6,13 +6,13 @@ use wcf\system\WCF;
 
 /**
  * Represents a liked object.
- *
+ * 
  * @author	Marcel Werk
- * @copyright	2001-2011 WoltLab GmbH
+ * @copyright	2001-2012 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf.like
  * @subpackage	data.like.object
- * @category 	Community Framework
+ * @category	Community Framework
  */
 class LikeObject extends DatabaseObject {
 	/**
@@ -27,7 +27,7 @@ class LikeObject extends DatabaseObject {
 	
 	/**
 	 * list of users who liked this object
-	 * @var array<wcf\data\user\User>
+	 * @var	array<wcf\data\user\User>
 	 */
 	protected $users = array();
 	
