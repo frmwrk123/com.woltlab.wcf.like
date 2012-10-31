@@ -368,6 +368,69 @@ class LikeHandler extends SingletonFactory {
 	}
 	
 	/**
+	 * Removes all likes for given object.
+	 * 
+	 * @param	wcf\data\like\object\ILikeObject	$likeable
+	 */
+	public function removeLikes(ILikeObject $likeable) {
+		// read like object
+		$sql = "SELECT	*
+			FROM	wcf".WCF_N."_like_object
+			WHERE	objectTypeID = ?
+				AND objectID = ?";
+		$statement = WCF::getDB()->prepareStatement($sql);
+		$statement->execute(array(
+				$likeable->getObjectType()->objectTypeID,
+				$likeable->getObjectID()
+		));
+		$likeObject = $statement->fetchObject('wcf\data\like\object\LikeObject');
+		
+		if ($likeObject->likeObjectID) {
+			$sql = "SELECT	likeID, likeValue
+				FROM	wcf".WCF_N."_like
+				WHERE	objectTypeID = ?
+					AND objectID = ?";
+			$statement = WCF::getDB()->prepareStatement($sql);
+			$statement->execute(array(
+				$likeable->getObjectType()->objectTypeID,
+				$likeable->getObjectID()
+			));
+			$likeIDs = array();
+			$likes = 0;
+			while ($row = $statement->fetchArray()) {
+				$likeIDs[] = $row['likeID'];
+				
+				if ($row['likeValue'] == Like::LIKE) {
+					$likes++;
+				}
+			}
+			
+			// remove likes
+			$sql = "DELETE FROM	wcf".WCF_N."_like
+				WHERE		objectTypeID = ?
+						AND objectID = ?";
+			$statement = WCF::getDB()->prepareStatement($sql);
+			$statement->execute(array(
+				$likeable->getObjectType()->objectTypeID,
+				$likeable->getObjectID()
+			));
+			
+			// remove like object
+			$likeObjectEditor = new LikeObjectEditor($likeObject);
+			$likeObjectEditor->delete();
+			
+			// revoke activity points
+			UserActivityPointHandler::getInstance()->removeEvents('com.woltlab.wcf.like.activityPointEvent.receivedLikes', $likeIDs);
+			
+			// reduce count of received users
+			$userEditor = new UserEditor(new User($likeable->getUserID()));
+			$userEditor->update(array(
+				'likesReceived' => $user->likes - $likes
+			));
+		}
+	}
+	
+	/**
 	 * Returns current like object status.
 	 * 
 	 * @param	wcf\data\like\object\LikeObject		$likeObject
