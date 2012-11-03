@@ -30,7 +30,7 @@ class ReceivedLikesUserActivityPointObjectProcessor implements IUserActivityPoin
 	}
 	
 	/**
-	 * @see wcf\system\user\activity\point\IUserActivityPointObject::countRequests();
+	 * @see	wcf\system\user\activity\point\IUserActivityPointObject::countRequests();
 	 */
 	public function countRequests() {
 		$sql = "SELECT	COUNT(*) AS count
@@ -44,7 +44,7 @@ class ReceivedLikesUserActivityPointObjectProcessor implements IUserActivityPoin
 	}
 	
 	/**
-	 * @see wcf\system\user\activity\point\IUserActivityPointObject::updateActivityPointEvents();
+	 * @see	wcf\system\user\activity\point\IUserActivityPointObject::updateActivityPointEvents();
 	 */
 	public function updateActivityPointEvents($request) {
 		if ($request == 0) {

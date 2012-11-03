@@ -26,7 +26,7 @@ WCF.Like = Class.extend({
 	
 	/**
 	 * user can like 
-	 * @var boolean
+	 * @var	boolean
 	 */
 	_canLike: false,
 	

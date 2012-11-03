@@ -15,7 +15,7 @@ use wcf\data\DatabaseObjectDecorator;
  */
 abstract class AbstractLikeObject extends DatabaseObjectDecorator implements ILikeObject {
 	/**
-	 * @see wcf\data\DatabaseObjectDecorator::$baseClass
+	 * @see	wcf\data\DatabaseObjectDecorator::$baseClass
 	 */
 	protected static $baseClass = 'wcf\data\like\object\LikeObject';
 	

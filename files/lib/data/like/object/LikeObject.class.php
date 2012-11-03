@@ -32,7 +32,7 @@ class LikeObject extends DatabaseObject {
 	protected $users = array();
 	
 	/**
-	 * @see wcf\data\DatabaseObject::handleData();
+	 * @see	wcf\data\DatabaseObject::handleData();
 	 */
 	protected function handleData($data) {
 		parent::handleData($data);
