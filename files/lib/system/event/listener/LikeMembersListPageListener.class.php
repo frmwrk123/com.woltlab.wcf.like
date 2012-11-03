@@ -14,7 +14,7 @@ use wcf\system\event\IEventListener;
  */
 class LikeMembersListPageListener implements IEventListener {
 	/**
-	 * @see wcf\system\event\IEventListener::execute()
+	 * @see	wcf\system\event\IEventListener::execute()
 	 */
 	public function execute($eventObj, $className, $eventName) {
 		$eventObj->validSortFields[] = 'likesReceived';

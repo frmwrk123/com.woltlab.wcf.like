@@ -18,7 +18,7 @@ use wcf\system\WCF;
  */
 class LikeAction extends AbstractDatabaseObjectAction {
 	/**
-	 * @see wcf\data\AbstractDatabaseObjectAction::$className
+	 * @see	wcf\data\AbstractDatabaseObjectAction::$className
 	 */
 	protected $className = 'wcf\data\like\LikeEditor';
 	
