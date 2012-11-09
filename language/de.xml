@@ -10,8 +10,8 @@
 		<item name="wcf.like.summary"><![CDATA[$userArray.join(", ") + ($others > 0 ? (" und " + $others + (" Weitere" + ($others > 1 ? "n" : "m"))) : "") + " gefällt das."]]></item>
 	</category>
 	
-	<category name="wcf.user.activity">
-		<item name="wcf.user.activity.point.objectType.com.woltlab.wcf.like.activityPointEvent.receivedLikes"><![CDATA[Erhaltene Likes]]></item>
+	<category name="wcf.user">
+		<item name="wcf.user.activityPoints.objectType.com.woltlab.wcf.like.activityPointEvent.receivedLikes"><![CDATA[Erhaltene Likes]]></item>
 	</category>
 	
 	<category name="wcf.acp.option">
