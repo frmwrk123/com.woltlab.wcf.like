@@ -2,7 +2,7 @@
  * Like support for WCF
  * 
  * @author	Alexander Ebert
- * @copyright	2001-2011 WoltLab GmbH
+ * @copyright	2001-2012 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  */
 WCF.Like = Class.extend({
@@ -11,13 +11,13 @@ WCF.Like = Class.extend({
 	 * @var	object
 	 */
 	_containers: { },
-
+	
 	/**
 	 * container meta data
 	 * @var	object
 	 */
 	_containerData: { },
-
+	
 	/**
 	 * proxy object
 	 * @var	WCF.Action.Proxy
@@ -26,7 +26,7 @@ WCF.Like = Class.extend({
 	
 	/**
 	 * user can like 
-	 * @var boolean
+	 * @var	boolean
 	 */
 	_canLike: false,
 	
@@ -53,7 +53,7 @@ WCF.Like = Class.extend({
 		this._proxy = new WCF.Action.Proxy({
 			success: $.proxy(this._success, this)
 		});
-	
+		
 		// bind dom node inserted listener
 		WCF.DOMNodeInsertedHandler.addCallback('WCF.Like', $.proxy(this._domNodeInserted, this));
 	},
@@ -98,14 +98,14 @@ WCF.Like = Class.extend({
 			}
 		}, this));
 	},
-
+	
 	/**
 	 * Returns a list of available object containers.
 	 * 
 	 * @return	jQuery
 	 */
 	_getContainers: function() { },
-
+	
 	/**
 	 * Returns widget container for target object container.
 	 * 
@@ -113,7 +113,7 @@ WCF.Like = Class.extend({
 	 * @return	jQuery
 	 */
 	_getWidgetContainer: function(containerID) { },
-
+	
 	/**
 	 * Returns object id for targer object container.
 	 * 
@@ -121,7 +121,7 @@ WCF.Like = Class.extend({
 	 * @return	integer
 	 */
 	_getObjectID: function(containerID) { },
-
+	
 	/**
 	 * Adds the like widget.
 	 * 
@@ -198,10 +198,10 @@ WCF.Like = Class.extend({
 			console.debug("[WCF.Like] Unable to find target button, aborting.");
 			return;
 		}
-
+		
 		this._sendRequest($button.data('containerID'), $button.data('type'));
 	},
-
+	
 	/**
 	 * Sends request through proxy.
 	 * 
@@ -242,7 +242,7 @@ WCF.Like = Class.extend({
 		this._containerData[$containerID].likes = parseInt(data.returnValues.likes);
 		this._containerData[$containerID].dislikes = parseInt(data.returnValues.dislikes);
 		this._containerData[$containerID].users = data.returnValues.users;
-
+		
 		// update label
 		this._updateBadge($containerID);
 		// update summary
@@ -251,7 +251,7 @@ WCF.Like = Class.extend({
 		// mark button as active
 		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
 		var $dislikeButton = this._containerData[$containerID].dislikeButton.removeClass('active');
-
+		
 		if (data.returnValues.isLiked) {
 			$likeButton.addClass('active');
 			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like.active'));

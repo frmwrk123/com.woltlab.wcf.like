@@ -32,7 +32,7 @@
 		
 		<templatelistener name="userStatistics">
 			<environment>user</environment>
-			<templatename>user</templatename>
+			<templatename>userSidebar</templatename>
 			<eventname>statistics</eventname>
 			<templatecode><![CDATA[{if MODULE_LIKE}<dt>{lang}wcf.like.likesReceived{/lang}</dt>
 <dd>{#$user->likesReceived}</dd>{/if}]]></templatecode>
