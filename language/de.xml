@@ -15,6 +15,6 @@
 	</category>
 	
 	<category name="wcf.acp.option">
-		<item name="wcf.acp.option.module_like"><![CDATA[Like-System aktivieren]]></item>
+		<item name="wcf.acp.option.module_like"><![CDATA[Like-System]]></item>
 	</category>
 </language>
