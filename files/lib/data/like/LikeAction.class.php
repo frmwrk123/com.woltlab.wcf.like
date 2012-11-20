@@ -1,7 +1,8 @@
 <?php
 namespace wcf\data\like;
 use wcf\data\AbstractDatabaseObjectAction;
-use wcf\system\exception\ValidateActionException;
+use wcf\system\exception\PermissionDeniedException;
+use wcf\system\exception\UserInputException;
 use wcf\system\like\LikeHandler;
 use wcf\system\user\activity\event\UserActivityEventHandler;
 use wcf\system\WCF;
@@ -23,52 +24,31 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	protected $className = 'wcf\data\like\LikeEditor';
 	
 	/**
-	 * @see	wcf\data\AbstractDatabaseObjectAction::validateCreate()
-	 */
-	public function validateCreate() {
-		throw new ValidateActionException("Action 'create' for likes is not supported.");
-	}
-	
-	/**
-	 * @see	wcf\data\AbstractDatabaseObjectAction::validateDelete()
-	 */
-	public function validateDelete() {
-		throw new ValidateActionException("Action 'delete' for likes is not supported.");
-	}
-	
-	/**
-	 * @see	wcf\data\AbstractDatabaseObjectAction::validateUpdate()
-	 */
-	public function validateUpdate() {
-		throw new ValidateActionException("Action 'update' for likes is not supported.");
-	}
-	
-	/**
 	 * Validates parameters for like-related actions.
 	 */
 	public function validateLike() {
 		if (!MODULE_LIKE) {
-			throw new ValidateActionException("like module disabled");
+			throw new PermissionDeniedException();
 		}
 		
 		if (!isset($this->parameters['data']['containerID'])) {
-			throw new ValidateActionException("missing parameter 'containerID'.");
+			throw new UserInputException('containerID');
 		}
 		
 		if (!isset($this->parameters['data']['objectID'])) {
-			throw new ValidateActionException("missing parameter 'objectID'.");
+			throw new UserInputException('objectID');
 		}
 		
 		if (!isset($this->parameters['data']['objectType'])) {
-			throw new ValidateActionException("missing parameter 'objectType'.");
+			throw new UserInputException('objectType');
 		}
 		if (LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']) === null) {
-			throw new ValidateActionException("invalid objectType given.");
+			throw new UserInputException('objectType');
 		}
 		
 		// check permissions
 		if (!WCF::getUser()->userID || !WCF::getSession()->getPermission('user.like.canLike')) {
-			throw new ValidateActionException("insufficient permisions");	
+			throw new PermissionDeniedException();	
 		}
 	}
 	
