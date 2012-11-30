@@ -3,7 +3,7 @@
 	<import>
 		<categories>
 			<category name="user.like">
-				<parent>user</parent>
+				<parent>user.message</parent>
 			</category>
 		</categories>
 		
