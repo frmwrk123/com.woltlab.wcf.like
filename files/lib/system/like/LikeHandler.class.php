@@ -281,8 +281,6 @@ class LikeHandler extends SingletonFactory {
 		// update object's like counter
 		$likeable->updateLikeCounter($cumulativeLikes);
 		
-		// TODO: create notification
-		
 		return array(
 			'data' => $this->loadLikeStatus($likeObject, $user),
 			'like' => $like,
