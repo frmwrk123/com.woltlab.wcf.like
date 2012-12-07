@@ -278,14 +278,14 @@ WCF.Like = Class.extend({
 			// update like counter
 			var $cumulativeLikes = this._containerData[containerID].likes - this._containerData[containerID].dislikes;
 			var $badge = this._containerData[containerID].badge;
-			$badge.removeClass('badgeGreen badgeRed');
+			$badge.removeClass('green red');
 			if ($cumulativeLikes > 0) {
 				$badge.text('+' + $cumulativeLikes);
-				$badge.addClass('badgeGreen');
+				$badge.addClass('green');
 			}
 			else if ($cumulativeLikes < 0) {
 				$badge.text($cumulativeLikes);
-				$badge.addClass('badgeRed');
+				$badge.addClass('red');
 			}
 			else {
 				$badge.text('±0');
