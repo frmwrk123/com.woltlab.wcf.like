@@ -383,7 +383,7 @@ class LikeHandler extends SingletonFactory {
 		));
 		$likeObject = $statement->fetchObject('wcf\data\like\object\LikeObject');
 		
-		if ($likeObject->likeObjectID) {
+		if ($likeObject !== null) {
 			$sql = "SELECT	likeID, likeValue
 				FROM	wcf".WCF_N."_like
 				WHERE	objectTypeID = ?
@@ -422,8 +422,8 @@ class LikeHandler extends SingletonFactory {
 			
 			// reduce count of received users
 			$userEditor = new UserEditor(new User($likeable->getUserID()));
-			$userEditor->update(array(
-				'likesReceived' => $user->likes - $likes
+			$userEditor->updateCounters(array(
+				'likesReceived' => $likes * -1
 			));
 		}
 	}
