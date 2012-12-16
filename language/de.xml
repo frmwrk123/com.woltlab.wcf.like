@@ -11,7 +11,7 @@
 	</category>
 	
 	<category name="wcf.user">
-		<item name="wcf.user.activityPoints.objectType.com.woltlab.wcf.like.activityPointEvent.receivedLikes"><![CDATA[Erhaltene Likes]]></item>
+		<item name="wcf.user.activityPoint.objectType.com.woltlab.wcf.like.activityPointEvent.receivedLikes"><![CDATA[Erhaltene Likes]]></item>
 	</category>
 	
 	<category name="wcf.acp.option">
