@@ -27,5 +27,6 @@
 		<instruction type="option">option.xml</instruction>
 		<instruction type="userGroupOption">userGroupOption.xml</instruction>
 		<instruction type="eventListener">eventListener.xml</instruction>
+		<instruction type="script">acp/install_com.woltlab.wcf.like_1.0.0.php</instruction>
 	</instructions>
 </package>
