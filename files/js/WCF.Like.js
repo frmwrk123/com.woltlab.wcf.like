@@ -174,15 +174,7 @@ WCF.Like = Class.extend({
 		
 		$likeButton.data('containerID', containerID).data('type', 'like').click($.proxy(this._click, this));
 		$dislikeButton.data('containerID', containerID).data('type', 'dislike').click($.proxy(this._click, this));
-		if (this._containerData[containerID].liked == 1) {
-			$likeButton.addClass('active');
-			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like.active'));
-		}
-		if (this._containerData[containerID].liked == -1) {
-			$dislikeButton.addClass('active');
-			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
-		}
-		
+		this._setActiveState($likeButton, $dislikeButton, this._containerData[containerID].liked);
 		this._updateBadge(containerID);
 		if (this._showSummary) this._updateSummary(containerID);
 	},
@@ -249,23 +241,12 @@ WCF.Like = Class.extend({
 		if (this._showSummary) this._updateSummary($containerID);
 		
 		// mark button as active
-		var $likeButton = this._containerData[$containerID].likeButton.removeClass('active');
-		var $dislikeButton = this._containerData[$containerID].dislikeButton.removeClass('active');
-		
-		if (data.returnValues.isLiked) {
-			$likeButton.addClass('active');
-			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like.active'));
-			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
-		}
-		else if (data.returnValues.isDisliked) {
-			$dislikeButton.addClass('active');
-			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
-			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
-		}
-		else {
-			$likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
-			$dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
-		}
+		var $likeButton = this._containerData[$containerID].likeButton;
+		var $dislikeButton = this._containerData[$containerID].dislikeButton;
+		var $likeStatus = 0;
+		if (data.returnValues.isLiked) $likeStatus = 1;
+		else if (data.returnValues.isDisliked) $likeStatus = -1;
+		this._setActiveState($likeButton, $dislikeButton, $likeStatus);
 	},
 	
 	_updateBadge: function(containerID) {
@@ -311,6 +292,37 @@ WCF.Like = Class.extend({
 			var $others = this._containerData[containerID].likes - $userArray.length;
 			
 			this._containerData[containerID].summary.text(eval(WCF.Language.get('wcf.like.summary')));
+		}
+	},
+	
+	/**
+	 * Sets button active state.
+	 * 
+	 * @param 	jquery		likeButton
+	 * @param 	jquery		dislikeButton
+	 * @param	integer		likeStatus
+	 */
+	_setActiveState: function(likeButton, dislikeButton, likeStatus) {
+		if (likeStatus == 1) {
+			likeButton.addClass('active');
+			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like.active'));
+			
+			dislikeButton.removeClass('active');
+			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
+		}
+		if (likeStatus == -1) {
+			dislikeButton.addClass('active');
+			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
+			
+			likeButton.removeClass('active');
+			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
+		}
+		if (likeStatus == 0) {
+			likeButton.removeClass('active');
+			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
+			
+			dislikeButton.removeClass('active');
+			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
 		}
 	}
 });

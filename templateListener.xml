@@ -19,7 +19,7 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptIconImport</eventname>
-			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.icon.like': '{icon}thumbsUp{/icon}','wcf.icon.dislike': '{icon}thumbsDown{/icon}','wcf.icon.like.active': '{icon}thumbsUpGreen{/icon}','wcf.icon.dislike.active': '{icon}thumbsDownRed{/icon}'{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.icon.like': '{icon}thumbsUp{/icon}','wcf.icon.dislike': '{icon}thumbsDown{/icon}','wcf.icon.like.active': '{icon}thumbsUpGreen{/icon}','wcf.icon.dislike.active': '{icon}thumbsDownRed{/icon}','wcf.icon.like.inverse': '{icon}thumbsUpInverse{/icon}','wcf.icon.dislike.inverse': '{icon}thumbsDownInverse{/icon}'{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="userInformationStatistics">
