@@ -89,7 +89,7 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		// fire activity event
 		if ($likeData['data']['liked'] == 1) {
 			if (UserActivityEventHandler::getInstance()->getObjectTypeID($objectType->objectType.'.recentActivityEvent')) {
-				UserActivityEventHandler::getInstance()->fireEvent($objectType->objectType.'.recentActivityEvent', $objectType->packageID, $this->parameters['data']['objectID']);
+				UserActivityEventHandler::getInstance()->fireEvent($objectType->objectType.'.recentActivityEvent', $this->parameters['data']['objectID']);
 			}
 		}
 		
