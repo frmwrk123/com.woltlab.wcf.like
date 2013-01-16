@@ -3,13 +3,16 @@ namespace wcf\system\like;
 use wcf\data\like\object\ILikeObject;
 use wcf\data\like\object\LikeObject;
 use wcf\data\like\object\LikeObjectEditor;
+use wcf\data\like\object\LikeObjectList;
 use wcf\data\like\Like;
 use wcf\data\like\LikeEditor;
+use wcf\data\like\LikeList;
 use wcf\data\object\type\ObjectType;
 use wcf\data\object\type\ObjectTypeCache;
 use wcf\data\user\User;
 use wcf\data\user\UserEditor;
 use wcf\system\database\util\PreparedStatementConditionBuilder;
+use wcf\system\user\activity\event\UserActivityEventHandler;
 use wcf\system\user\activity\point\UserActivityPointHandler;
 use wcf\system\SingletonFactory;
 use wcf\system\WCF;
@@ -366,65 +369,60 @@ class LikeHandler extends SingletonFactory {
 	}
 	
 	/**
-	 * Removes all likes for given object.
+	 * Removes all likes for given objects.
 	 * 
-	 * @param	wcf\data\like\object\ILikeObject	$likeable
+	 * @param	string		$objectType
+	 * @param	array<integer>	$objectIDs
 	 */
-	public function removeLikes(ILikeObject $likeable) {
-		// read like object
-		$sql = "SELECT	*
-			FROM	wcf".WCF_N."_like_object
-			WHERE	objectTypeID = ?
-				AND objectID = ?";
-		$statement = WCF::getDB()->prepareStatement($sql);
-		$statement->execute(array(
-				$likeable->getObjectType()->objectTypeID,
-				$likeable->getObjectID()
-		));
-		$likeObject = $statement->fetchObject('wcf\data\like\object\LikeObject');
+	public function removeLikes($objectType, array $objectIDs) {
+		$objectTypeObj = $this->getObjectType($objectType);
 		
-		if ($likeObject !== null) {
-			$sql = "SELECT	likeID, likeValue
-				FROM	wcf".WCF_N."_like
-				WHERE	objectTypeID = ?
-					AND objectID = ?";
-			$statement = WCF::getDB()->prepareStatement($sql);
-			$statement->execute(array(
-				$likeable->getObjectType()->objectTypeID,
-				$likeable->getObjectID()
-			));
-			$likeIDs = array();
-			$likes = 0;
-			while ($row = $statement->fetchArray()) {
-				$likeIDs[] = $row['likeID'];
-				
-				if ($row['likeValue'] == Like::LIKE) {
-					$likes++;
-				}
+		// get like objects
+		$likeObjectList = new LikeObjectList();
+		$likeObjectList->getConditionBuilder()->add('like_object.objectTypeID = ?', array($objectTypeObj->objectTypeID));
+		$likeObjectList->getConditionBuilder()->add('like_object.objectID IN (?)', array($objectIDs));
+		$likeObjectList->readObjects();
+		$likeObjects = $likeObjectList->getObjects();
+		$likeObjectIDs = $likeObjectList->getObjectIDs();
+		
+		// reduce count of received users
+		$users = array();
+		foreach ($likeObjects as $likeObject) {
+			if ($likeObject->likes) {
+				if (!isset($users[$likeObject->objectUserID])) $users[$likeObject->objectUserID] = 0;
+				$users[$likeObject->objectUserID] += $likeObject->likes;
 			}
-			
-			// remove likes
-			$sql = "DELETE FROM	wcf".WCF_N."_like
-				WHERE		objectTypeID = ?
-						AND objectID = ?";
-			$statement = WCF::getDB()->prepareStatement($sql);
-			$statement->execute(array(
-				$likeable->getObjectType()->objectTypeID,
-				$likeable->getObjectID()
+		}
+		foreach ($users as $userID => $receivedLikes) {
+			$userEditor = new UserEditor(new User(null, array('userID' => $userID)));
+			$userEditor->updateCounters(array(
+				'likesReceived' => $receivedLikes * -1
 			));
-			
-			// remove like object
-			$likeObjectEditor = new LikeObjectEditor($likeObject);
-			$likeObjectEditor->delete();
-			
+		}
+		
+		// get like ids
+		$likeList = new LikeList();
+		$likeList->getConditionBuilder()->add('like_table.objectTypeID = ?', array($objectTypeObj->objectTypeID));
+		$likeList->getConditionBuilder()->add('like_table.objectID IN (?)', array($objectIDs));
+		$likeList->readObjectIDs();
+		$likeIDs = $likeList->getObjectIDs();
+		
+		if (!empty($likeIDs)) {
 			// revoke activity points
 			UserActivityPointHandler::getInstance()->removeEvents('com.woltlab.wcf.like.activityPointEvent.receivedLikes', $likeIDs);
 			
-			// reduce count of received users
-			$userEditor = new UserEditor(new User($likeable->getUserID()));
-			$userEditor->updateCounters(array(
-				'likesReceived' => $likes * -1
-			));
+			// delete likes
+			LikeEditor::deleteAll($likeIDs);
+		}
+		
+		// delete like objects
+		if (!empty($likeObjectIDs)) {
+			LikeObjectEditor::deleteAll($likeObjectIDs);
+		}
+		
+		// delete activity events
+		if (UserActivityEventHandler::getInstance()->getObjectTypeID($objectTypeObj->objectType.'.recentActivityEvent')) {
+			UserActivityEventHandler::getInstance()->removeEvents($objectTypeObj->objectType.'.recentActivityEvent', $objectIDs);
 		}
 	}
 	

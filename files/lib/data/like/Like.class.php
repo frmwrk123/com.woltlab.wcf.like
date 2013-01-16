@@ -24,8 +24,16 @@ class Like extends DatabaseObject {
 	 */
 	protected static $databaseTableIndexName = 'likeID';
 	
+	/**
+	 * like value
+	 * @var integer
+	 */
 	const LIKE = 1;
 	
+	/**
+	 * dislike value
+	 * @var integer
+	 */
 	const DISLIKE = -1;
 	
 	/**
@@ -56,5 +64,12 @@ class Like extends DatabaseObject {
 		}
 		
 		return new Like(null, $row);
+	}
+	
+	/**
+	 * @see	wcf\data\IStorableObject::getDatabaseTableAlias()
+	 */
+	public static function getDatabaseTableAlias() {
+		return 'like_table';
 	}
 }
