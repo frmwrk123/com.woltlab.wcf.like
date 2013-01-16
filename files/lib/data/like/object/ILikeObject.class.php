@@ -2,7 +2,7 @@
 namespace wcf\data\like\object;
 use wcf\data\object\type\ObjectType;
 use wcf\data\IDatabaseObjectProcessor;
-use wcf\data\ITitledDatabaseObject;
+use wcf\data\ITitledObject;
 
 /**
  * Any likeable object should implement this interface.
@@ -14,7 +14,7 @@ use wcf\data\ITitledDatabaseObject;
  * @subpackage	data.like.object
  * @category	Community Framework
  */
-interface ILikeObject extends IDatabaseObjectProcessor, ITitledDatabaseObject {
+interface ILikeObject extends IDatabaseObjectProcessor, ITitledObject {
 	/**
 	 * Returns the url to this likeable.
 	 * 
