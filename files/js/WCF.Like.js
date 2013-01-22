@@ -160,8 +160,8 @@ WCF.Like = Class.extend({
 	 * @param	integer		containerID
 	 */
 	_createWidget: function(containerID) {
-		var $likeButton = $('<li class="likeButton"><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.like') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
-		var $dislikeButton = $('<li class="dislikeButton"><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="jsTooltip"><img src="' + WCF.Icon.get('wcf.icon.dislike') + '" alt="" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
+		var $likeButton = $('<li class="likeButton"><a title="'+WCF.Language.get('wcf.like.button.like')+'" class="jsTooltip"><span class="icon icon16 icon-thumbs-up" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.like')+'</span></a></li>');
+		var $dislikeButton = $('<li class="dislikeButton"><a title="'+WCF.Language.get('wcf.like.button.dislike')+'" class="jsTooltip"><span class="icon icon16 icon-thumbs-down" /> <span class="invisible">'+WCF.Language.get('wcf.like.button.dislike')+'</span></a></li>');
 		var $badge = $('<a class="badge jsTooltip likesBadge"></a>');
 		if (this._showSummary) var $summary = $('<p class="likesSummary"></p>');
 		this._buildWidget(containerID, $likeButton, $dislikeButton, $badge, $summary);
@@ -303,26 +303,14 @@ WCF.Like = Class.extend({
 	 * @param	integer		likeStatus
 	 */
 	_setActiveState: function(likeButton, dislikeButton, likeStatus) {
+		likeButton.removeClass('active');
+		dislikeButton.removeClass('active');
+		
 		if (likeStatus == 1) {
 			likeButton.addClass('active');
-			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like.active'));
-			
-			dislikeButton.removeClass('active');
-			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
 		}
-		if (likeStatus == -1) {
+		else if (likeStatus == -1) {
 			dislikeButton.addClass('active');
-			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike.active'));
-			
-			likeButton.removeClass('active');
-			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
-		}
-		if (likeStatus == 0) {
-			likeButton.removeClass('active');
-			likeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.like'));
-			
-			dislikeButton.removeClass('active');
-			dislikeButton.find('img').attr('src', WCF.Icon.get('wcf.icon.dislike'));
 		}
 	}
 });
