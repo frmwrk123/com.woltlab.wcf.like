@@ -5,7 +5,7 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptInclude</eventname>
-			<templatecode><![CDATA[{if MODULE_LIKE}<script type="text/javascript" src="{@$__wcf->getPath('wcf')}js/WCF.Like.js"></script>{/if}]]></templatecode>
+			<templatecode><![CDATA[<script type="text/javascript" src="{@$__wcf->getPath('wcf')}js/WCF.Like.js"></script>]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="javascriptLanguageImport">
