@@ -1,4 +1,5 @@
 ALTER TABLE wcf1_user ADD likesReceived MEDIUMINT(7) NOT NULL DEFAULT 0;
+ALTER TABLE wcf1_user ADD INDEX likesReceived (likesReceived);
 
 DROP TABLE IF EXISTS wcf1_like;
 CREATE TABLE wcf1_like (
