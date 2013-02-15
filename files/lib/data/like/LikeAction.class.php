@@ -1,5 +1,7 @@
 <?php
 namespace wcf\data\like;
+use wcf\system\user\GroupedUserList;
+
 use wcf\data\AbstractDatabaseObjectAction;
 use wcf\system\exception\PermissionDeniedException;
 use wcf\system\exception\UserInputException;
@@ -10,8 +12,10 @@ use wcf\system\WCF;
 /**
  * Executes like-related actions.
  * 
+ * @todo	Add validation of permissions for each object being liked (including statistics)
+ * 
  * @author	Alexander Ebert
- * @copyright	2001-2012 WoltLab GmbH
+ * @copyright	2001-2013 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  * @package	com.woltlab.wcf
  * @subpackage	data.like
@@ -19,32 +23,73 @@ use wcf\system\WCF;
  */
 class LikeAction extends AbstractDatabaseObjectAction {
 	/**
+	 * @see	wcf\data\AbstractDatabaseObjectAction::$allowGuestAccess
+	 */
+	protected $allowGuestAccess = array('getLikeDetails');
+	
+	/**
 	 * @see	wcf\data\AbstractDatabaseObjectAction::$className
 	 */
 	protected $className = 'wcf\data\like\LikeEditor';
 	
 	/**
+	 * Validates parameters to fetch like details.
+	 */
+	public function validateGetLikeDetails() {
+		$this->validateObjectParameters();
+	}
+	
+	/**
+	 * Returns like details.
+	 * 
+	 * @return	array<string>
+	 */
+	public function getLikeDetails() {
+		$sql = "SELECT	userID, likeValue
+			FROM	wcf".WCF_N."_like
+			WHERE	objectID = ?
+				AND objectTypeID = ?";
+		$statement = WCF::getDB()->prepareStatement($sql);
+		$statement->execute(array(
+			$this->parameters['data']['objectID'],
+			LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType'])->objectTypeID
+		));
+		$data = array(
+			Like::LIKE => array(),
+			Like::DISLIKE => array()
+		);
+		while ($row = $statement->fetchArray()) {
+			$data[$row['likeValue']][] = $row['userID'];
+		}
+		
+		$values = array();
+		if (!empty($data[Like::LIKE])) {
+			$values[Like::LIKE] = new GroupedUserList(WCF::getLanguage()->get('wcf.like.details.like'));
+			$values[Like::LIKE]->addUserIDs($data[Like::LIKE]);
+		}
+		if (!empty($data[Like::DISLIKE])) {
+			$values[Like::DISLIKE] = new GroupedUserList(WCF::getLanguage()->get('wcf.like.details.dislike'));
+			$values[Like::DISLIKE]->addUserIDs($data[Like::DISLIKE]);
+		}
+		
+		// load user profiles
+		GroupedUserList::loadUsers();
+		
+		WCF::getTPL()->assign(array(
+			'groupedUsers' => $values
+		));
+		
+		return array(
+			'containerID' => $this->parameters['data']['containerID'],
+			'template' => WCF::getTPL()->fetch('groupedUserList')
+		);
+	}
+	
+	/**
 	 * Validates parameters for like-related actions.
 	 */
 	public function validateLike() {
-		if (!MODULE_LIKE) {
-			throw new PermissionDeniedException();
-		}
-		
-		if (!isset($this->parameters['data']['containerID'])) {
-			throw new UserInputException('containerID');
-		}
-		
-		if (!isset($this->parameters['data']['objectID'])) {
-			throw new UserInputException('objectID');
-		}
-		
-		if (!isset($this->parameters['data']['objectType'])) {
-			throw new UserInputException('objectType');
-		}
-		if (LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']) === null) {
-			throw new UserInputException('objectType');
-		}
+		$this->validateObjectParameters();
 		
 		// check permissions
 		if (!WCF::getUser()->userID || !WCF::getSession()->getPermission('user.like.canLike')) {
@@ -103,5 +148,24 @@ class LikeAction extends AbstractDatabaseObjectAction {
 			'containerID' => $this->parameters['data']['containerID'],
 			'users' => $likeData['users']
 		);
+	}
+	
+	/**
+	 * Validates permissions for given object.
+	 */
+	protected function validateObjectParameters() {
+		if (!MODULE_LIKE) {
+			throw new PermissionDeniedException();
+		}
+		
+		$this->readString('containerID', false, 'data');
+		$this->readInteger('objectID', false, 'data');
+		$this->readString('objectType', false, 'data');
+		
+		if (LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']) === null) {
+			throw new UserInputException('objectType');
+		}
+		
+		// TODO: Validate object permissions
 	}
 }
