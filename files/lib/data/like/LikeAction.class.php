@@ -11,8 +11,6 @@ use wcf\system\WCF;
 /**
  * Executes like-related actions.
  * 
- * @todo	Add validation of permissions for each object being liked (including statistics)
- * 
  * @author	Alexander Ebert
  * @copyright	2001-2013 WoltLab GmbH
  * @license	GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
@@ -30,6 +28,18 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	 * @see	wcf\data\AbstractDatabaseObjectAction::$className
 	 */
 	protected $className = 'wcf\data\like\LikeEditor';
+	
+	/**
+	 * object type object
+	 * @var	wcf\data\object\type\ObjectType
+	 */
+	public $objectType = null;
+	
+	/**
+	 * like object type provider object
+	 * @var	wcf\data\like\ILikeObjectTypeProvider
+	 */
+	public $objectTypeProvider = null;
 	
 	/**
 	 * Validates parameters to fetch like details.
@@ -51,7 +61,7 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		$statement = WCF::getDB()->prepareStatement($sql);
 		$statement->execute(array(
 			$this->parameters['data']['objectID'],
-			LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType'])->objectTypeID
+			$this->objectType->objectTypeID
 		));
 		$data = array(
 			Like::LIKE => array(),
@@ -124,16 +134,14 @@ class LikeAction extends AbstractDatabaseObjectAction {
 	 * @return	array
 	 */
 	protected function updateLike($likeValue) {
-		$objectType = LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']);
-		$objectProvider = $objectType->getProcessor();
-		$likeableObject = $objectProvider->getObjectByID($this->parameters['data']['objectID']);
-		$likeableObject->setObjectType($objectType);
+		$likeableObject = $this->objectTypeProvider->getObjectByID($this->parameters['data']['objectID']);
+		$likeableObject->setObjectType($this->objectType);
 		$likeData = LikeHandler::getInstance()->like($likeableObject, WCF::getUser(), $likeValue);
 		
 		// fire activity event
 		if ($likeData['data']['liked'] == 1) {
-			if (UserActivityEventHandler::getInstance()->getObjectTypeID($objectType->objectType.'.recentActivityEvent')) {
-				UserActivityEventHandler::getInstance()->fireEvent($objectType->objectType.'.recentActivityEvent', $this->parameters['data']['objectID']);
+			if (UserActivityEventHandler::getInstance()->getObjectTypeID($this->objectType->objectType.'.recentActivityEvent')) {
+				UserActivityEventHandler::getInstance()->fireEvent($this->objectType->objectType.'.recentActivityEvent', $this->parameters['data']['objectID']);
 			}
 		}
 		
@@ -161,10 +169,14 @@ class LikeAction extends AbstractDatabaseObjectAction {
 		$this->readInteger('objectID', false, 'data');
 		$this->readString('objectType', false, 'data');
 		
-		if (LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']) === null) {
+		$this->objectType = LikeHandler::getInstance()->getObjectType($this->parameters['data']['objectType']);
+		if ($this->objectType === null) {
 			throw new UserInputException('objectType');
 		}
 		
-		// TODO: Validate object permissions
+		$this->objectTypeProvider = $this->objectType->getProcessor();
+		if (!$this->objectTypeProvider->checkPermissions($this->parameters['data']['objectID'])) {
+			throw new PermissionDeniedException();
+		}
 	}
 }

@@ -3,6 +3,7 @@
 	<import>
 		<definition>
 			<name>com.woltlab.wcf.like.likeableObject</name>
+			<interfacename>wcf\data\like\ILikeObjectTypeProvider</interfacename>
 		</definition>
 	</import>
 </data>
