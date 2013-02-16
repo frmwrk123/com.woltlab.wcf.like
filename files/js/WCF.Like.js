@@ -304,6 +304,11 @@ WCF.Like = Class.extend({
 				if (data.returnValues.isLiked) $likeStatus = 1;
 				else if (data.returnValues.isDisliked) $likeStatus = -1;
 				this._setActiveState($likeButton, $dislikeButton, $likeStatus);
+				
+				// invalidate cache for like details
+				if (this._likeDetails[$containerID] !== undefined) {
+					delete this._likeDetails[$containerID];
+				}
 			break;
 			
 			case 'getLikeDetails':
