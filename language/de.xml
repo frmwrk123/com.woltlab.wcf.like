@@ -7,8 +7,8 @@
 	
 	<category name="wcf.like">
 		<item name="wcf.like.cumulativeLikes"><![CDATA[Likes]]></item>
-		<item name="wcf.like.tooltip"><![CDATA[{if $likes}{#$likes} Likes{if $dislikes}, {/if}{/if}{if $dislikes}{#$dislikes} Dislikes{/if}]]></item>
-		<item name="wcf.like.jsTooltip"><![CDATA[($likes > 0 ? ($likes + " Likes" + ($dislikes > 0 ? ", " : "")) : "") + ($dislikes > 0 ? ($dislikes + " Dislikes") : "")]]></item>
+		<item name="wcf.like.tooltip"><![CDATA[{if $likes}{#$likes} Like{if $likes != 1}s{/if}{if $dislikes}, {/if}{/if}{if $dislikes}{#$dislikes} Dislike{if $dislikes != 1}s{/if}{/if}]]></item>
+		<item name="wcf.like.jsTooltip"><![CDATA[($likes > 0 ? ($likes + " Like" + ($likes != 1 ? "s" : "") + ($dislikes > 0 ? ", " : "")) : "") + ($dislikes > 0 ? ($dislikes + " Dislike" + ($dislikes != 1 ? "s" : "")) : "")]]></item>
 		<item name="wcf.like.button.like"><![CDATA[Gefällt mir]]></item>
 		<item name="wcf.like.button.dislike"><![CDATA[Gefällt mir nicht]]></item>
 		<item name="wcf.like.likesReceived"><![CDATA[Likes erhalten]]></item>
