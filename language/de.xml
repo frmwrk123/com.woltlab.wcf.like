@@ -13,6 +13,9 @@
 		<item name="wcf.like.button.dislike"><![CDATA[Gefällt mir nicht]]></item>
 		<item name="wcf.like.likesReceived"><![CDATA[Likes erhalten]]></item>
 		<item name="wcf.like.summary"><![CDATA[$userArray.join(", ") + ($others > 0 ? (" und " + $others + (" weitere" + ($others > 1 ? "n" : "m"))) : "") + " gefällt das."]]></item>
+		<item name="wcf.like.details"><![CDATA[Details]]></item>
+		<item name="wcf.like.details.like"><![CDATA[Likes]]></item>
+		<item name="wcf.like.details.dislike"><![CDATA[Dislikes]]></item>
 	</category>
 	
 	<category name="wcf.user">

@@ -12,7 +12,7 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptLanguageImport</eventname>
-			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.tooltip': '{lang}wcf.like.jsTooltip{/lang}','wcf.like.summary': '{lang}wcf.like.summary{/lang}'{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_LIKE},'wcf.like.button.like': '{lang}wcf.like.button.like{/lang}','wcf.like.button.dislike': '{lang}wcf.like.button.dislike{/lang}','wcf.like.tooltip': '{lang}wcf.like.jsTooltip{/lang}','wcf.like.summary': '{lang}wcf.like.summary{/lang}','wcf.like.details': '{lang}wcf.like.details{/lang}'{/if}]]></templatecode>
 		</templatelistener>
 		
 		<templatelistener name="userInformationStatistics">
