@@ -12,7 +12,7 @@
 		<item name="wcf.like.button.like"><![CDATA[Like]]></item>
 		<item name="wcf.like.button.dislike"><![CDATA[Dislike]]></item>
 		<item name="wcf.like.likesReceived"><![CDATA[Likes Received]]></item>
-		<item name="wcf.like.summary"><![CDATA[$userArray.join(", ") + ($others > 0 ? (" and " + $others + (" other" + ($others > 1 ? "s" : ""))) : "") + " likes this."]]></item>
+		<item name="wcf.like.summary"><![CDATA[$userArray.join(", ") + ($others > 0 ? (" and " + $others + (" other" + ($others > 1 ? "s" : ""))) : "") + " like" + ($userArray.length == 1 ? "s" : "") +  " this."]]></item>
 		<item name="wcf.like.details"><![CDATA[Details]]></item>
 		<item name="wcf.like.details.like"><![CDATA[Likes]]></item>
 		<item name="wcf.like.details.dislike"><![CDATA[Dislikes]]></item>
