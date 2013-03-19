@@ -70,7 +70,9 @@ WCF.Like = Class.extend({
 		});
 		
 		// bind dom node inserted listener
-		WCF.DOMNodeInsertedHandler.addCallback('WCF.Like', $.proxy(this._domNodeInserted, this));
+		var $date = new Date();
+		var $identifier = $date.toString().hashCode + $date.getUTCMilliseconds();
+		WCF.DOMNodeInsertedHandler.addCallback('WCF.Like' + $identifier, $.proxy(this._domNodeInserted, this));
 	},
 	
 	/**
