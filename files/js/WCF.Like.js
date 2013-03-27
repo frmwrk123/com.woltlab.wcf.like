@@ -30,6 +30,12 @@ WCF.Like = Class.extend({
 	_enableDislikes: true,
 	
 	/**
+	 * prevents like/dislike until the server responded
+	 * @var	boolean
+	 */
+	_isBusy: false,
+	
+	/**
 	 * cached template for like details
 	 * @var	object
 	 */
@@ -58,6 +64,7 @@ WCF.Like = Class.extend({
 	init: function(canLike, enableDislikes, showSummary) {
 		this._canLike = canLike;
 		this._enableDislikes = enableDislikes;
+		this._isBusy = false;
 		this._likeDetails = { };
 		this._likeDetailsDialog = null;
 		this._showSummary = showSummary;
@@ -257,6 +264,11 @@ WCF.Like = Class.extend({
 	 * @param	string		type
 	 */
 	_sendRequest: function(containerID, type) {
+		// ignore retards spamming clicks on the buttons
+		if (this._isBusy) {
+			return;
+		}
+		
 		this._proxy.setOption('data', {
 			actionName: type,
 			className: 'wcf\\data\\like\\LikeAction',
@@ -311,6 +323,8 @@ WCF.Like = Class.extend({
 				if (this._likeDetails[$containerID] !== undefined) {
 					delete this._likeDetails[$containerID];
 				}
+				
+				this._isBusy = false;
 			break;
 			
 			case 'getLikeDetails':
